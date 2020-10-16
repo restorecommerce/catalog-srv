@@ -1,0 +1,384 @@
+= Catalog Service
+
+https://travis-ci.org/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/travis/restorecommerce/catalog-srv/master.svg?style=flat-square[Build Status]]
+https://david-dm.org/restorecommerce/catalog-srv[image:https://img.shields.io/david/restorecommerce/catalog-srv.svg?style=flat-square[Dependencies]]
+https://coveralls.io/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/coveralls/restorecommerce/catalog-srv/master.svg?style=flat-square[Coverage Status]]
+
+A microservice for catalog and offer management.
+
+[#features]
+== Features
+
+* It provides a https://grpc.io/docs[gRPC] interface for handling CRUD operations, catalog and offer functionality.
+
+[#API]
+== API
+
+This microservice exposes the following gRPC endpoints:
+
+[#api_manufacturer]
+=== Manufacturer
+
+A Manufacturer resource.
+
+`io.restorecommerce.manufacturer.Manufacturer`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |required |Manufacturer ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
+|name |string |required |Name
+|description |string |optional |description
+|===
+
+A list of Manufacturer resources.
+
+`io.restorecommerce.manufacturer.ManufacturerList`
+
+|===
+|Field |Type |Label |Description
+
+|items |[ ]`io.restorecommerce.manufacturer.Manufacturer` |required |List of Manufacturers
+|total_count |number |optional |number of Manufacturers
+|===
+
+[#api_price_group]
+=== PriceGroup
+
+A PriceGroup resource.
+
+`io.restorecommerce.price_group.PriceGroup`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |required |PriceGroup ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
+|name |string |required |Name
+|description |string |optional |description
+|===
+
+A list of PriceGroup resources.
+
+`io.restorecommerce.price_group.PriceGroupList`
+
+|===
+|Field |Type |Label |Description
+
+|items |[ ]`io.restorecommerce.price_group.PriceGroup` |required |List of PriceGroups
+|total_count |number |optional |number of PriceGroups
+|===
+
+[#api_product_category]
+=== ProductCategory
+
+A ProductCategory resource.
+
+`io.restorecommerce.product_category.ProductCategory`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |required |ProductCategory ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
+|name |string |required |Name
+|description |string |optional |description
+|price_group_id |`io.restorecommerce.price_group.PriceGroup.id` |required |price group identifier
+|===
+
+A list of ProductCategory resources.
+
+`io.restorecommerce.product_category.ProductCategoryList`
+
+|===
+|Field |Type |Label |Description
+
+|items |[ ]`io.restorecommerce.product_category.ProductCategory` |required |List of Product Categories
+|total_count |number |optional |number of Product Categories
+|===
+
+[#api_product_prototype]
+=== ProductPrototype
+
+A ProductPrototype resource.
+
+`io.restorecommerce.product_prototype.ProductPrototype`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |required |ProductPrototype ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
+|name |string |required |Name
+|description |string |optional |description
+|category_id |`io.restorecommerce.product_category.ProductCategory.id` |required |price group identifier
+|===
+
+A list of ProductPrototype resources.
+
+`io.restorecommerce.product_prototype.ProductPrototypeList`
+
+|===
+|Field |Type |Label |Description
+
+|items |[ ]`io.restorecommerce.product_prototype.ProductPrototype` |required |List of Product Prototypes
+|total_count |number |optional |number of Product Prototypes
+|===
+
+[#api_product]
+=== Product
+
+A Product resource.
+
+`io.restorecommerce.product.Product`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |required |Product ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
+|name |string |required |Name
+|description |string |optional |description
+|manufacturer_id |`io.restorecommerce.manufacturer.Manufacturer.id` |required |Manufacturer identifier
+|prototype_id |`io.restorecommerce.product_prototype.ProductPrototype.id` |required |Product Prototype identifier
+|===
+
+A list of Product resources.
+
+`io.restorecommerce.product.ProductList`
+
+|===
+|Field |Type |Label |Description
+
+|items |[ ]`io.restorecommerce.product.Product` |required |List of Products
+|total_count |number |optional |number of Products
+|===
+
+[#api_bundle]
+=== Bundle
+
+A Bundle resource.
+
+`io.restorecommerce.bundle.Bundle`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |required |Bundle ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
+|name |string |required |Name
+|description |string |optional |description
+|product_ids |[] `io.restorecommerce.product.Product.id` |required |List of Product identifiers
+|===
+
+A list of Bundle resources:
+
+`io.restorecommerce.bundle.BundleList`
+
+|===
+|Field |Type |Label |Description
+
+|items |[ ]`io.restorecommerce.bundle.Bundle` |required |List of Bundles
+|total_count |number |optional |number of Bundles
+|===
+
+[#api_offer]
+=== Offer
+
+A Offer resource.
+
+`io.restorecommerce.offer.Offer`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |required |Offer ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
+|name |string |required |Name
+|bundle_ids |[ ] `io.restorecommerce.bundle.Bundle.id` |one of |list of Bundle Identifiers
+|product_ids |[ ] `io.restorecommerce.product.Product.id` |one of |List of Product identifiers
+|===
+
+A list of Offer resources.
+
+`io.restorecommerce.offer.OfferList`
+
+|===
+|Field |Type |Label |Description
+
+|items |[ ]`io.restorecommerce.offer.Offer` |required |List of Offers
+|total_count |number |optional |number of Offers
+|===
+
+[#api_product_crud]
+==== CRUD Operations
+
+The microservice exposes the below CRUD operations for creating or
+modifying Product, ProductPrototype, ProductCategory, PriceGroup, Manufacturer, Bundle and Offer resources.
+
+`io.restorecommerce.product.Service`
+
+|===
+|Method Name |Request Type |Response Type |Description
+
+|Create |`io.restorecommerce.product.ProductList` |`io.restorecommerce.product.ProductList` |Create a list of Product resources
+|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.product.ProductList` |Read a list of Product resources
+|Update |`io.restorecommerce.product.ProductList` |`io.restorecommerce.product.ProductList` |Update a list of Product resources
+|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of Prodeuct resources
+|Upsert |`io.restorecommerce.product.ProductList` |`io.restorecommerce.product.ProductList` |Create or Update a list of Product resources
+|===
+
+`io.restorecommerce.product_prototype.Service`
+
+|===
+|Method Name |Request Type |Response Type |Description
+
+|Create |`io.restorecommerce.product_prototype.ProductPrototypeList` |`io.restorecommerce.product_prototype.ProductPrototypeList` |Create a list of ProductPrototype resources
+|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.product_prototype.ProductPrototypeList` |Read a list of ProductPrototype resources
+|Update |`io.restorecommerce.product_prototype.ProductPrototypeList` |`io.restorecommerce.product_prototype.ProductPrototypeList` |Update a list of ProductPrototype resources
+|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of ProductPrototype resources
+|Upsert |`io.restorecommerce.product_prototype.ProductPrototypeList` |`io.restorecommerce.product_prototype.ProductPrototypeList` |Create or Update a list of ProductPrototype resources
+|===
+
+`io.restorecommerce.product_category.Service`
+
+|===
+|Method Name |Request Type |Response Type |Description
+
+|Create |`io.restorecommerce.product_category.ProductCategoryList` |`io.restorecommerce.product_category.ProductCategoryList` |Create a list of ProductCategory resources
+|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.product_category.ProductCategoryList` |Read a list of ProductCategory resources
+|Update |`io.restorecommerce.product_category.ProductCategoryList` |`io.restorecommerce.product_category.ProductCategoryList` |Update a list of ProductCategory resources
+|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of ProductCategory resources
+|Upsert |`io.restorecommerce.product_category.ProductCategoryList` |`io.restorecommerce.product_category.ProductCategoryList` |Create or Update a list of ProductCategory resources
+|===
+
+`io.restorecommerce.price_group.Service`
+
+|===
+|Method Name |Request Type |Response Type |Description
+
+|Create |`io.restorecommerce.price_group.PriceGroupList` |`io.restorecommerce.price_group.PriceGroupList` |Create a list of PriceGroup resources
+|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.price_group.PriceGroupList` |Read a list of PriceGroup resources
+|Update |`io.restorecommerce.price_group.PriceGroupList` |`io.restorecommerce.price_group.PriceGroupList` |Update a list of PriceGroup resources
+|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of PriceGroup resources
+|Upsert |`io.restorecommerce.price_group.PriceGroupList` |`io.restorecommerce.price_group.PriceGroupList` |Create or Update a list of PriceGroup resources
+|===
+
+`io.restorecommerce.manufacturer.Service`
+
+|===
+|Method Name |Request Type |Response Type |Description
+
+|Create |`io.restorecommerce.manufacturer.ManufacturerList` |`io.restorecommerce.manufacturer.ManufacturerList` |Create a list of Manufacturer resources
+|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.manufacturer.ManufacturerList` |Read a list of Manufacturer resources
+|Update |`io.restorecommerce.manufacturer.ManufacturerList` |`io.restorecommerce.manufacturer.ManufacturerList` |Update a list of Manufacturer resources
+|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of Manufacturer resources
+|Upsert |`io.restorecommerce.manufacturer.ManufacturerList` |`io.restorecommerce.manufacturer.ManufacturerList` |Create or Update a list of Manufacturer resources
+|===
+
+`io.restorecommerce.bundle.Service`
+
+|===
+|Method Name |Request Type |Response Type |Description
+
+|Create |`io.restorecommerce.bundle.BundleList` |`io.restorecommerce.bundle.BundleList` |Create a list of Bundle resources
+|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.bundle.BundleList` |Read a list of Bundle resources
+|Update |`io.restorecommerce.bundle.BundleList` |`io.restorecommerce.bundle.BundleList` |Update a list of Bundle resources
+|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of Bundle resources
+|Upsert |`io.restorecommerce.bundle.BundleList` |`io.restorecommerce.bundle.BundleList` |Create or Update a list of Bundle resources
+|===
+
+`io.restorecommerce.offer.Service`
+
+|===
+|Method Name |Request Type |Response Type |Description
+
+|Create |`io.restorecommerce.offer.OfferList` |`io.restorecommerce.offer.OfferList` |Create a list of Offer resources
+|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.offer.OfferList` |Read a list of Offer resources
+|Update |`io.restorecommerce.offer.OfferList` |`io.restorecommerce.offer.OfferList` |Update a list of Offer resources
+|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of Offer resources
+|Upsert |`io.restorecommerce.offer.OfferList` |`io.restorecommerce.offer.OfferList` |Create or Update a list of Offer resources
+|===
+
+For the detailed protobuf message structure of
+`io.restorecommerce.resourcebase.ReadRequest` and `io.restorecommerce.resourcebase.DeleteRequest`
+refer https://github.com/restorecommerce/resource-base-interface[resource-base-interface].
+
+[#events]
+== Events
+
+[#emitted-events]
+=== Emitted
+
+List of events emitted by this microservice for below topics:
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.products.resource` |`productCreated` |product created
+| |`productModified` |product modified
+| |`productDeleted` |product deleted
+|=====================================================================================
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.product_prototypes.resource` |`productPrototypeCreated` |product prototype created
+| |`productPrototypeCreatedModified` |product prototype created modified
+| |`productPrototypeCreatedDeleted` |product prototype created deleted
+|=====================================================================================
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.product_categorys.resource` |`productCategoryCreated` |product category created
+| |`productCategoryModified` |product category modified
+| |`productCategoryDeleted` |product category deleted
+|=====================================================================================
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.price_groups.resource` |`priceGroupCreated` |price group created
+| |`priceGroupModified` |price group modified
+| |`priceGroupDeleted` |price group deleted
+|=====================================================================================
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.manufacturers.resource` |`manufacturerCreated` |manufacturer created
+| |`manufacturerModified` |manufacturer modified
+| |`manufacturerDeleted` |manufacturer deleted
+|=====================================================================================
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.bundles.resource` |`bundleCreated` |bundle created
+| |`bundleModified` |bundle modified
+| |`bundleDeleted` |bundle deleted
+|=====================================================================================
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.offers.resource` |`offerCreated` |offer created
+| |`offerModified` |offer modified
+| |`offerDeleted` |offer deleted
+|=====================================================================================
+
+[#consumed-events]
+=== Consumed
+
+This microservice consumes messages for the following events by topic:
+
+[width="100%",cols="31%,33%,36%",options="header",]
+|=====================================================================================
+|Topic Name |Event Name |Description
+|`io.restorecommerce.command` |`restoreCommand` |for triggering for system restore
+| |`resetCommand` |for triggering system reset
+| |`healthCheckCommand` |to get system health check
+| |`versionCommand` |to get system version
+|=====================================================================================

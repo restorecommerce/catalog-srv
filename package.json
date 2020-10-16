@@ -1,0 +1,68 @@
+{
+  "name": "@restorecommerce/catalog-srv",
+  "version": "0.0.2",
+  "description": "Restore Commerce microservice for catalog and offers",
+  "main": "./lib/index.js",
+  "author": "n-fuse GmbH",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/restorecommerce/catalog-srv.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "restore",
+    "commerce",
+    "microservice",
+    "catalog",
+    "srv"
+  ],
+  "dependencies": {
+    "@restorecommerce/chassis-srv": "^0.1.6",
+    "@restorecommerce/cluster-service": "^0.1.4",
+    "@restorecommerce/grpc-client": "^0.0.7",
+    "@restorecommerce/kafka-client": "^0.1.12",
+    "@restorecommerce/logger": "^0.3.5",
+    "@restorecommerce/protos": "0.0.12",
+    "@restorecommerce/resource-base-interface": "^0.0.5",
+    "@restorecommerce/service-config": "^0.3.1",
+    "elasticsearch": "^16.4.0",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@types/elasticsearch": "^5.0.35",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
+    "@types/lodash": "^4.14.142",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.11",
+    "cross-env": "^6.0.3",
+    "eslint": "^6.7.0",
+    "eslint-plugin-prefer-arrow-functions": "^3.0.1",
+    "mocha": "^6.2.1",
+    "npm-run-all": "^4.1.5",
+    "nodemon": "^2.0.1",
+    "rimraf": "^3.0.0",
+    "should": "^13.2.1",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.2"
+  },
+  "scripts": {
+    "start": "npm run createtopics && node lib/start.js",
+    "dev": "cross-env NODE_ENV=development npm run createtopics && nodemon --watch './src/**/*.ts' --exec 'ts-node' ./src/start.ts",
+    "pretest": "npm run tsctests && npm run createtopics",
+    "test": "npm run lint && npm run build",
+    "tsctests": "tsc test/*.ts --module commonjs -target ES6",
+    "lint": "eslint src --ext .ts --fix",
+    "createtopics": "node setupTopics.js io.restorecommerce.command",
+    "mocha": "cross-env NODE_ENV=test mocha -R spec ./test/*.js --full-trace --exit",
+    "test-debug": "mocha ./test/*.js --inspect-brk --exit",
+    "postinstall": "tsc -d",
+    "build:tsc": "tsc -d",
+    "build:clean": "rimraf lib",
+    "build": "npm-run-all lint build:clean build:tsc"
+  },
+  "engines": {
+    "node": ">= 9.2.0"
+  }
+}

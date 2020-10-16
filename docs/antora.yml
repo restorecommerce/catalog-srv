@@ -1,0 +1,5 @@
+name: catalog-srv
+title: Catalog Service
+version: master
+nav:
+  - modules/ROOT/nav.adoc

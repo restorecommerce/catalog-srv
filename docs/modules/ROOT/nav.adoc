@@ -1,0 +1,21 @@
+// INDEX
+* xref:index.adoc[Catalog Service]
+
+// FEATURES
+* xref:index.adoc#features[Features]
+
+// API
+* xref:index.adoc#API[API]
+** xref:index.adoc#api_manufacturer[Manufacturer]
+** xref:index.adoc#api_price_group[PriceGroup]
+** xref:index.adoc#api_product_category[ProductCategory]
+** xref:index.adoc#api_product_prototype[ProductPrototype]
+** xref:index.adoc#api_product[Product]
+** xref:index.adoc#api_bundle[Bundle]
+** xref:index.adoc#api_offer[Offer]
+** xref:index.adoc#api_product_crud[CRUD Operations]
+
+// EVENTS
+* xref:index.adoc#events[Events]
+** xref:index.adoc#emitted-events[Emitted]
+** xref:index.adoc#consumed-events[Consumed]
