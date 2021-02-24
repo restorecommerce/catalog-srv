@@ -20,10 +20,10 @@
     "@restorecommerce/chassis-srv": "^0.1.10",
     "@restorecommerce/cluster-service": "^0.1.4",
     "@restorecommerce/kafka-client": "^0.1.13",
-    "@restorecommerce/logger": "^0.5.4",
+    "@restorecommerce/logger": "^0.6.1",
     "@restorecommerce/protos": "^0.0.20",
     "@restorecommerce/resource-base-interface": "^0.0.7",
-    "@restorecommerce/service-config": "^0.3.4",
+    "@restorecommerce/service-config": "^0.4.1",
     "elasticsearch": "^16.7.2",
     "lodash": "^4.17.21",
     "redis": "^3.0.2"
