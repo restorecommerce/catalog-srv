@@ -12,12 +12,14 @@
     "outDir": "lib",
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
+    "lib": ["ES2019"],
   },
   "include": [
     "./src/**/*.ts"
   ],
   "exclude": [
+    "**/*.test.ts",
     "doc",
     "lib",
     "node_modules"

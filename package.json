@@ -17,36 +17,37 @@
     "srv"
   ],
   "dependencies": {
-    "@restorecommerce/chassis-srv": "^0.1.11",
+    "@restorecommerce/chassis-srv": "^0.1.12",
     "@restorecommerce/cluster-service": "^0.1.4",
     "@restorecommerce/kafka-client": "^0.1.13",
     "@restorecommerce/logger": "^0.6.4",
     "@restorecommerce/protos": "^0.0.22",
-    "@restorecommerce/resource-base-interface": "^0.0.7",
+    "@restorecommerce/resource-base-interface": "^0.0.9",
     "@restorecommerce/service-config": "^0.4.1",
     "elasticsearch": "^16.7.2",
     "lodash": "^4.17.21",
-    "redis": "^3.0.2"
+    "redis": "^3.1.1"
   },
   "devDependencies": {
     "@types/elasticsearch": "^5.0.37",
+    "@types/jest": "^26.0.21",
     "@types/lodash": "^4.14.168",
-    "@types/mocha": "^8.2.1",
-    "@types/node": "^14.14.34",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/eslint-plugin-tslint": "^4.17.0",
-    "@typescript-eslint/parser": "^4.17.0",
+    "@types/node": "^14.14.41",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
     "cross-env": "^7.0.3",
-    "eslint": "^7.21.0",
+    "eslint": "^7.24.0",
     "eslint-plugin-prefer-arrow-functions": "^3.0.1",
-    "mocha": "^8.3.2",
+    "jest": "^26.6.3",
     "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "should": "^13.2.1",
+    "ts-jest": "^26.5.5",
     "ts-node": "^9.1.1",
     "tslint": "^6.1.3",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.4"
   },
   "scripts": {
     "build": "npm-run-all lint build:clean build:tsc",
@@ -55,12 +56,9 @@
     "createtopics": "node setupTopics.js io.restorecommerce.command",
     "dev": "cross-env NODE_ENV=development npm run createtopics && nodemon --watch './src/**/*.ts' --exec 'ts-node' ./src/start.ts",
     "lint": "eslint src --ext .ts --fix",
-    "mocha": "cross-env NODE_ENV=test mocha -R spec ./test/*.js --full-trace --exit",
-    "pretest": "npm run build && npm run tsctests && npm run createtopics",
+    "pretest": "npm run createtopics",
     "start": "npm run createtopics && node lib/start.js",
-    "test": "npm run lint",
-    "test-debug": "mocha ./test/*.js --inspect-brk --exit",
-    "tsctests": "tsc test/*.ts --module commonjs -target ES6"
+    "test": "jest --runInBand --testTimeout=30000 --forceExit"
   },
   "engines": {
     "node": ">= 9.2.0"
