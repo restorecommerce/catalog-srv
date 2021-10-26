@@ -19,7 +19,16 @@
   },
   "events": {
     "kafka": {
-      "kafkaHost": "kafka:9092"
+      "kafka": {
+        "brokers": [
+          "kafka:9092"
+        ]
+      }
+    }
+  },
+  "client": {
+    "default-catalog-srv": {
+      "address": "0.0.0.0:50051"
     }
   },
   "server": {
@@ -32,9 +41,9 @@
           "io-restorecommerce-catalog-cis": "io.restorecommerce.commandinterface.Service",
           "io-restorecommerce-manufacturer-srv": "io.restorecommerce.manufacturer.Service",
           "io-restorecommerce-price_group-srv": "io.restorecommerce.price_group.Service",
-          "io-restorecommerce-product_category-srv": "io-restorecommerce-product_category.Service",
-          "io-restorecommerce-product_prototype-srv": "io-restorecommerce-product_prototype.Service",
-          "io-restorecommerce-product-srv": "io-restorecommerce-product.Service",
+          "io-restorecommerce-product_category-srv": "io.restorecommerce.product_category.Service",
+          "io-restorecommerce-product_prototype-srv": "io.restorecommerce.product_prototype.Service",
+          "io-restorecommerce-product-srv": "io.restorecommerce.product.Service",
           "grpc-health-v1": "grpc.health.v1.Health"
         },
         "protos": [

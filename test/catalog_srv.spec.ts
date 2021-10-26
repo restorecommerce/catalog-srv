@@ -1,5 +1,5 @@
 import * as should from 'should';
-import * as grpcClient from '@restorecommerce/grpc-client';
+import { GrpcClient } from '@restorecommerce/grpc-client';
 import { Worker } from '../src/worker';
 import { createLogger } from '@restorecommerce/logger';
 import { createServiceConfig } from '@restorecommerce/service-config';
@@ -42,42 +42,49 @@ const listOfManufacturers = [
 
 // get client connection object
 const getClientResourceServices = async () => {
-  const options: any = {microservice: {}};
+  const options: any = { microservice: {} };
   options.microservice = {
     service: {},
     mapClients: new Map()
   };
   const resources = cfg.get('resources');
   const clientConfig = cfg.get('client');
-  for (let resource in resources) {
-    const resourceCfg = resources[resource];
-    const resourceNames = resourceCfg.entities;
-    const protosPrefix = resourceCfg.protoPathPrefix;
-    const servicePrefix = resourceCfg.serviceNamePrefix;
+  for (let resourceType in resources) {
+    const resourceCfg = resources[resourceType];
+    const protoPathPrefix = resourceCfg.protoPathPrefix;
+    const serviceNamePrefix = resourceCfg.serviceNamePrefix;
 
-    logger.silly('microservice clients', resourceNames);
+    for (let service in resourceCfg.resources) {
+      const serviceCfg = resourceCfg.resources[service]; // serviceCfg - [ 'address', 'contact_point_type']
+      for (let resource of serviceCfg) {
+        const protoPath = [`${protoPathPrefix}/${resource}.proto`];
+        const protoRoot = resources.restorecommerce.protoRoot;
+        const packageName = `${serviceNamePrefix}${resource}`;
+        const serviceName = 'Service';
 
-    for (let resource of resourceNames) {
-      if (resource === 'command') {
-        const serviceName = 'io.restorecommerce.commandinterface.Service';
-        const client = new grpcClient.Client(cfg.get('client:commandinterface'), logger);
-        options.microservice.service[serviceName] = await client.connect();
-        options.microservice.mapClients.set(resource, serviceName);
-        continue;
-      }
-      const protos = [`${protosPrefix}/${resource}.proto`];
-      const serviceName = `${servicePrefix}${resource}.Service`;
-      const defaultConfig = clientConfig['default-catalog-srv'];
-      defaultConfig.transports.grpc.protos = protos;
-      defaultConfig.transports.grpc.service = serviceName;
-      try {
-        const client = new grpcClient.Client(defaultConfig, logger);
-        options.microservice.service[serviceName] = await client.connect();
-        options.microservice.mapClients.set(resource, serviceName);
-        logger.verbose('connected to microservice', serviceName);
-      } catch (err) {
-        logger.error('microservice connecting to service',
-          serviceName, err);
+        const defaultConfig = clientConfig[service];
+        defaultConfig.proto = {
+          protoRoot,
+          protoPath,
+          services: {
+            [service]: {
+              packageName,
+              serviceName
+            }
+          }
+        };
+
+        const fullServiceName = `${packageName}.${serviceName}`;
+        try {
+          const client = new GrpcClient(defaultConfig, logger);
+          options.microservice.service[fullServiceName] = client[service];
+          options.microservice.mapClients.set(resource, fullServiceName);
+          logger.verbose('connected to microservice: ' + fullServiceName);
+          options.microservice.mapClients.set(resource, serviceName);
+        } catch (err) {
+          logger.error('microservice connecting to service',
+            fullServiceName, err);
+        }
       }
     }
   }
@@ -110,7 +117,7 @@ describe('catalog-srv testing', () => {
   });
 
   it('should create manufacturer resource', async () => {
-    const result = await manufacturerSrv.create({items: listOfManufacturers});
+    const result = await manufacturerSrv.create({ items: listOfManufacturers });
     baseValidation(result);
     result.data.items.should.be.length(listOfManufacturers.length);
     result.data.items[0].name.should.equal(listOfManufacturers[0].name);
@@ -143,7 +150,7 @@ describe('catalog-srv testing', () => {
         meta
       }
     ];
-    const update = await manufacturerSrv.update({items: changedManufacturerList});
+    const update = await manufacturerSrv.update({ items: changedManufacturerList });
     baseValidation(update);
     update.data.items.should.be.length(2);
     const updatedResult = await manufacturerSrv.read({
@@ -173,7 +180,7 @@ describe('catalog-srv testing', () => {
         meta
       }
     ];
-    const update = await manufacturerSrv.upsert({items: upsertedManufacturerList});
+    const update = await manufacturerSrv.upsert({ items: upsertedManufacturerList });
     baseValidation(update);
     update.data.items.should.be.length(2);
     const updatedResult = await manufacturerSrv.read({
@@ -221,7 +228,7 @@ describe('catalog-srv testing', () => {
     baseValidation(resultAfterDeletion);
     resultAfterDeletion.data.items.should.be.length(0);
 
-    const orgDeletionResult = await manufacturerSrv.delete({collection: true});
+    const orgDeletionResult = await manufacturerSrv.delete({ collection: true });
     should.exist(orgDeletionResult);
     should.not.exist(orgDeletionResult.error);
   });

@@ -9,34 +9,16 @@
   },
   "events": {
     "kafka": {
-      "kafkaHost": "localhost:29092"
+      "kafka": {
+        "brokers": [
+          "localhost:29092"
+        ]
+      }
     }
   },
   "client": {
     "default-catalog-srv": {
-      "transports": {
-        "grpc": {
-          "service": "",
-          "timeout": 3000,
-          "protoRoot": "node_modules/@restorecommerce/protos/"
-        }
-      },
-      "loadbalancer": {
-        "name": "roundRobin"
-      },
-      "publisher": {
-        "name": "static",
-        "instances": [
-          "grpc://localhost:50068"
-        ]
-      },
-      "endpoints": {
-        "read": {},
-        "create": {},
-        "delete": {},
-        "update": {},
-        "upsert": {}
-      }
+      "address": "localhost:50068"
     }
   }
 }
