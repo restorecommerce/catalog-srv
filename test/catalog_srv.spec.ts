@@ -80,7 +80,6 @@ const getClientResourceServices = async () => {
           options.microservice.service[fullServiceName] = client[service];
           options.microservice.mapClients.set(resource, fullServiceName);
           logger.verbose('connected to microservice: ' + fullServiceName);
-          options.microservice.mapClients.set(resource, serviceName);
         } catch (err) {
           logger.error('microservice connecting to service',
             fullServiceName, err);
@@ -98,18 +97,21 @@ describe('catalog-srv testing', () => {
 
   let baseValidation = (result: any) => {
     should.exist(result);
-    should.not.exist(result.error);
-    should.exist(result.data);
-    should.exist(result.data.items);
+    should.exist(result.items);
+    should.exist(result.operation_status);
+    should.exist(result.operation_status.code);
+    should.exist(result.operation_status.message);
+    result.operation_status.code.should.equal(200);
+    result.operation_status.message.should.equal('success');
   };
 
   beforeAll(async () => {
     worker = new Worker(cfg);
     await worker.start();
 
-    const serviceMapping = await getClientResourceServices();
+    const options = await getClientResourceServices();
 
-    manufacturerSrv = serviceMapping.microservice.service[serviceMapping.microservice.mapClients.get('manufacturer')];
+    manufacturerSrv = options.microservice.service[options.microservice.mapClients.get('manufacturer')];
   });
 
   afterAll(async () => {
@@ -119,9 +121,9 @@ describe('catalog-srv testing', () => {
   it('should create manufacturer resource', async () => {
     const result = await manufacturerSrv.create({ items: listOfManufacturers });
     baseValidation(result);
-    result.data.items.should.be.length(listOfManufacturers.length);
-    result.data.items[0].name.should.equal(listOfManufacturers[0].name);
-    result.data.items[1].name.should.equal(listOfManufacturers[1].name);
+    result.items.should.be.length(listOfManufacturers.length);
+    result.items[0].payload.name.should.equal(listOfManufacturers[0].name);
+    result.items[1].payload.name.should.equal(listOfManufacturers[1].name);
   });
 
   it('should read manufacturer resource', async () => {
@@ -132,9 +134,9 @@ describe('catalog-srv testing', () => {
       }]
     });
     baseValidation(result);
-    result.data.items.should.be.length(listOfManufacturers.length);
-    result.data.items[0].name.should.equal(listOfManufacturers[0].name);
-    result.data.items[1].name.should.equal(listOfManufacturers[1].name);
+    result.items.should.be.length(listOfManufacturers.length);
+    result.items[0].payload.name.should.equal(listOfManufacturers[0].name);
+    result.items[1].payload.name.should.equal(listOfManufacturers[1].name);
   });
 
   it('should update manufacturer resource', async () => {
@@ -152,7 +154,7 @@ describe('catalog-srv testing', () => {
     ];
     const update = await manufacturerSrv.update({ items: changedManufacturerList });
     baseValidation(update);
-    update.data.items.should.be.length(2);
+    update.items.should.be.length(2);
     const updatedResult = await manufacturerSrv.read({
       sort: [{
         field: 'name',
@@ -160,9 +162,9 @@ describe('catalog-srv testing', () => {
       }]
     });
     baseValidation(updatedResult);
-    updatedResult.data.items.should.be.length(2);
-    updatedResult.data.items[0].name.should.equal('Manufacturer 3');
-    updatedResult.data.items[1].name.should.equal('Manufacturer 4');
+    updatedResult.items.should.be.length(2);
+    updatedResult.items[0].payload.name.should.equal('Manufacturer 3');
+    updatedResult.items[1].payload.name.should.equal('Manufacturer 4');
   });
 
   it('should upsert manufacturer resource', async () => {
@@ -180,10 +182,10 @@ describe('catalog-srv testing', () => {
         meta
       }
     ];
-    const update = await manufacturerSrv.upsert({ items: upsertedManufacturerList });
-    baseValidation(update);
-    update.data.items.should.be.length(2);
-    const updatedResult = await manufacturerSrv.read({
+    const upsert = await manufacturerSrv.upsert({ items: upsertedManufacturerList });
+    baseValidation(upsert);
+    upsert.items.should.be.length(2);
+    const upsertedResult = await manufacturerSrv.read({
       sort: [
         {
           field: 'modified',
@@ -195,11 +197,11 @@ describe('catalog-srv testing', () => {
         }
       ]
     });
-    baseValidation(updatedResult);
-    updatedResult.data.items.should.be.length(listOfManufacturers.length + 1);
-    updatedResult.data.items[0].name.should.equal('Manufacturer 4');
-    updatedResult.data.items[1].name.should.equal('Manufacturer 5');
-    updatedResult.data.items[2].name.should.equal('Manufacturer 6');
+    baseValidation(upsertedResult);
+    upsertedResult.items.should.be.length(listOfManufacturers.length + 1);
+    upsertedResult.items[0].payload.name.should.equal('Manufacturer 4');
+    upsertedResult.items[1].payload.name.should.equal('Manufacturer 5');
+    upsertedResult.items[2].payload.name.should.equal('Manufacturer 6');
   });
 
   it('should delete manufacturer resource', async () => {
@@ -212,12 +214,18 @@ describe('catalog-srv testing', () => {
     baseValidation(result);
 
     const deleteIDs = {
-      ids: result.data.items.map(i => i.id)
+      ids: result.items.map(i => i.payload.id)
     };
 
     const deletedResult = await manufacturerSrv.delete(deleteIDs);
     should.exist(deletedResult);
-    should.not.exist(deletedResult.error);
+    deletedResult.status.length.should.equal(3);
+    deletedResult.status.map((statusObj) => {
+      statusObj.code.should.equal(200);
+      statusObj.message.should.equal('success');
+    });
+    deletedResult.operation_status.code.should.equal(200);
+    deletedResult.operation_status.message.should.equal('success');
 
     const resultAfterDeletion = await manufacturerSrv.read({
       sort: [{
@@ -226,10 +234,11 @@ describe('catalog-srv testing', () => {
       }]
     });
     baseValidation(resultAfterDeletion);
-    resultAfterDeletion.data.items.should.be.length(0);
+    resultAfterDeletion.items.should.be.length(0);
 
     const orgDeletionResult = await manufacturerSrv.delete({ collection: true });
     should.exist(orgDeletionResult);
-    should.not.exist(orgDeletionResult.error);
+    deletedResult.operation_status.code.should.equal(200);
+    deletedResult.operation_status.message.should.equal('success');
   });
 });

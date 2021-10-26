@@ -43,7 +43,14 @@
           "product_prototype",
           "product"
         ]
-      }
+      },
+      "entities": [
+        "manufacturer",
+        "price_group",
+        "product_category",
+        "product_prototype",
+        "product"
+      ]
     }
   },
   "client": {
