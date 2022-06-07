@@ -1,8 +1,8 @@
 = Catalog Service
 
 https://travis-ci.org/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/travis/restorecommerce/catalog-srv/master.svg?style=flat-square[Build Status]]
-https://david-dm.org/restorecommerce/catalog-srv[image:https://img.shields.io/david/restorecommerce/catalog-srv.svg?style=flat-square[Dependencies]]
-https://coveralls.io/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/coveralls/restorecommerce/catalog-srv/master.svg?style=flat-square[Coverage Status]]
+https://depfu.com/repos/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/depfu/dependencies/github/restorecommerce/catalog-srv?style=flat-square[Dependencies]]
+https://coveralls.io/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/coveralls/github/restorecommerce/catalog-srv/master.svg?style=flat-square[Coverage Status]]
 
 A microservice for catalog and offer management.
 
