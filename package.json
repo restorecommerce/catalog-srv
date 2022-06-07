@@ -24,7 +24,7 @@
     "@restorecommerce/protos": "^0.4.7",
     "@restorecommerce/resource-base-interface": "^0.2.0",
     "@restorecommerce/service-config": "^0.4.18",
-    "elasticsearch": "^16.7.2",
+    "elasticsearch": "^16.7.3",
     "lodash": "^4.17.21",
     "redis": "^3.1.2"
   },
