@@ -1,12 +1,19 @@
 import * as should from 'should';
-import { GrpcClient } from '@restorecommerce/grpc-client';
+import { createChannel, createClient } from '@restorecommerce/grpc-client';
 import { Worker } from '../src/worker';
 import { createLogger } from '@restorecommerce/logger';
 import { createServiceConfig } from '@restorecommerce/service-config';
+import { ServiceDefinition as manufacturer, ManufacturerList, ServiceClient as ManufacturerClient } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer';
+import { ServiceDefinition as price_group } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group';
+import { ServiceDefinition as product_category } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
+import { ServiceDefinition as product_prototype } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype';
+import { ServiceDefinition as product } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product';
+import { ReadRequest, Sort_SortOrder, DeleteRequest } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/resource_base';
 
 const cfg = createServiceConfig(process.cwd());
 const logger = createLogger(cfg.get('logger'));
 
+const ServiceDefinitions: any = [manufacturer, price_group, product_category, product_prototype, product];
 /**
  * Note: To run below tests a running Kafka, Redis and ArangoDB instance is required.
  * Kafka can be disabled if the config 'enableEvents' is set to false.
@@ -48,7 +55,7 @@ const getClientResourceServices = async () => {
     mapClients: new Map()
   };
   const resources = cfg.get('resources');
-  const clientConfig = cfg.get('client');
+  const defaultConfig = cfg.get('client:default-catalog-srv');
   for (let resourceType in resources) {
     const resourceCfg = resources[resourceType];
     const protoPathPrefix = resourceCfg.protoPathPrefix;
@@ -57,27 +64,14 @@ const getClientResourceServices = async () => {
     for (let service in resourceCfg.resources) {
       const serviceCfg = resourceCfg.resources[service]; // serviceCfg - [ 'address', 'contact_point_type']
       for (let resource of serviceCfg) {
-        const protoPath = [`${protoPathPrefix}/${resource}.proto`];
-        const protoRoot = resources.restorecommerce.protoRoot;
         const packageName = `${serviceNamePrefix}${resource}`;
         const serviceName = 'Service';
 
-        const defaultConfig = clientConfig[service];
-        defaultConfig.proto = {
-          protoRoot,
-          protoPath,
-          services: {
-            [service]: {
-              packageName,
-              serviceName
-            }
-          }
-        };
-
         const fullServiceName = `${packageName}.${serviceName}`;
         try {
-          const client = new GrpcClient(defaultConfig, logger);
-          options.microservice.service[fullServiceName] = client[service];
+          const serviceDef = ServiceDefinitions.filter((obj) => obj.fullName.split('.')[2] === resource)[0];
+          const client = createClient({ ...defaultConfig, logger }, serviceDef, createChannel(defaultConfig.address));
+          options.microservice.service[fullServiceName] = client;
           options.microservice.mapClients.set(resource, fullServiceName);
           logger.verbose('connected to microservice: ' + fullServiceName);
         } catch (err) {
@@ -92,7 +86,7 @@ const getClientResourceServices = async () => {
 };
 
 describe('catalog-srv testing', () => {
-  let manufacturerSrv;
+  let manufacturerSrv: ManufacturerClient;
   let worker: Worker;
 
   let baseValidation = (result: any) => {
@@ -119,7 +113,7 @@ describe('catalog-srv testing', () => {
   });
 
   it('should create manufacturer resource', async () => {
-    const result = await manufacturerSrv.create({ items: listOfManufacturers });
+    const result = await manufacturerSrv.create(ManufacturerList.fromPartial({ items: listOfManufacturers }), {});
     baseValidation(result);
     result.items.should.be.length(listOfManufacturers.length);
     result.items[0].payload.name.should.equal(listOfManufacturers[0].name);
@@ -127,12 +121,12 @@ describe('catalog-srv testing', () => {
   });
 
   it('should read manufacturer resource', async () => {
-    const result = await manufacturerSrv.read({
+    const result = await manufacturerSrv.read(ReadRequest.fromPartial({
       sort: [{
         field: 'name',
-        order: 1,
+        order: Sort_SortOrder.ASCENDING,
       }]
-    });
+    }), {});
     baseValidation(result);
     result.items.should.be.length(listOfManufacturers.length);
     result.items[0].payload.name.should.equal(listOfManufacturers[0].name);
@@ -152,15 +146,15 @@ describe('catalog-srv testing', () => {
         meta
       }
     ];
-    const update = await manufacturerSrv.update({ items: changedManufacturerList });
+    const update = await manufacturerSrv.update(ManufacturerList.fromPartial({ items: changedManufacturerList }), {});
     baseValidation(update);
     update.items.should.be.length(2);
-    const updatedResult = await manufacturerSrv.read({
+    const updatedResult = await manufacturerSrv.read(ReadRequest.fromPartial({
       sort: [{
         field: 'name',
-        order: 1,
+        order: Sort_SortOrder.ASCENDING,
       }]
-    });
+    }), {});
     baseValidation(updatedResult);
     updatedResult.items.should.be.length(2);
     updatedResult.items[0].payload.name.should.equal('Manufacturer 3');
@@ -182,21 +176,21 @@ describe('catalog-srv testing', () => {
         meta
       }
     ];
-    const upsert = await manufacturerSrv.upsert({ items: upsertedManufacturerList });
+    const upsert = await manufacturerSrv.upsert(ManufacturerList.fromPartial({ items: upsertedManufacturerList }), {});
     baseValidation(upsert);
     upsert.items.should.be.length(2);
-    const upsertedResult = await manufacturerSrv.read({
+    const upsertedResult = await manufacturerSrv.read(ReadRequest.fromPartial({
       sort: [
         {
           field: 'modified',
-          order: 1,
+          order: Sort_SortOrder.ASCENDING,
         },
         {
           field: 'name',
-          order: 1
+          order: Sort_SortOrder.ASCENDING
         }
       ]
-    });
+    }));
     baseValidation(upsertedResult);
     upsertedResult.items.should.be.length(listOfManufacturers.length + 1);
     upsertedResult.items[0].payload.name.should.equal('Manufacturer 4');
@@ -205,19 +199,19 @@ describe('catalog-srv testing', () => {
   });
 
   it('should delete manufacturer resource', async () => {
-    const result = await manufacturerSrv.read({
+    const result = await manufacturerSrv.read(ReadRequest.fromPartial({
       sort: [{
         field: 'created',
-        order: 1,
+        order: Sort_SortOrder.ASCENDING,
       }]
-    });
+    }));
     baseValidation(result);
 
     const deleteIDs = {
       ids: result.items.map(i => i.payload.id)
     };
 
-    const deletedResult = await manufacturerSrv.delete(deleteIDs);
+    const deletedResult = await manufacturerSrv.delete(DeleteRequest.fromPartial(deleteIDs), {});
     should.exist(deletedResult);
     deletedResult.status.length.should.equal(3);
     deletedResult.status.map((statusObj) => {
@@ -227,12 +221,12 @@ describe('catalog-srv testing', () => {
     deletedResult.operation_status.code.should.equal(200);
     deletedResult.operation_status.message.should.equal('success');
 
-    const resultAfterDeletion = await manufacturerSrv.read({
+    const resultAfterDeletion = await manufacturerSrv.read(ReadRequest.fromPartial({
       sort: [{
         field: 'created',
-        order: 1,
+        order: Sort_SortOrder.ASCENDING,
       }]
-    });
+    }), {});
     baseValidation(resultAfterDeletion);
     resultAfterDeletion.items.should.be.length(0);
 

@@ -17,50 +17,48 @@
     "srv"
   ],
   "dependencies": {
-    "@restorecommerce/chassis-srv": "^0.3.2",
-    "@restorecommerce/cluster-service": "^0.1.10",
-    "@restorecommerce/kafka-client": "^0.2.23",
-    "@restorecommerce/logger": "^0.10.8",
-    "@restorecommerce/protos": "^0.4.7",
-    "@restorecommerce/resource-base-interface": "^0.2.0",
-    "@restorecommerce/service-config": "^0.4.18",
-    "elasticsearch": "^16.7.2",
+    "@restorecommerce/chassis-srv": "^1.1.2",
+    "@restorecommerce/cluster-service": "^1.0.1",
+    "@restorecommerce/kafka-client": "^1.0.4",
+    "@restorecommerce/logger": "^1.2.1",
+    "@restorecommerce/rc-grpc-clients": "^2.0.1",
+    "@restorecommerce/resource-base-interface": "^1.1.1",
+    "@restorecommerce/service-config": "^1.0.3",
+    "elasticsearch": "^16.7.3",
     "lodash": "^4.17.21",
-    "redis": "^3.1.2"
+    "redis": "^4.3.1"
   },
   "devDependencies": {
-    "@types/elasticsearch": "^5.0.38",
-    "@types/jest": "^27.0.2",
-    "@types/lodash": "^4.14.176",
-    "@types/node": "^16.11.5",
-    "@typescript-eslint/eslint-plugin": "^5.1.0",
-    "@typescript-eslint/eslint-plugin-tslint": "^5.1.0",
-    "@typescript-eslint/parser": "^5.1.0",
+    "@types/elasticsearch": "^5.0.40",
+    "@types/jest": "^29.2.0",
+    "@types/lodash": "^4.14.186",
+    "@types/node": "^18.11.4",
+    "@typescript-eslint/eslint-plugin": "^5.40.1",
+    "@typescript-eslint/eslint-plugin-tslint": "^5.40.1",
+    "@typescript-eslint/parser": "^5.40.1",
     "cross-env": "^7.0.3",
-    "eslint": "^8.1.0",
-    "eslint-plugin-prefer-arrow-functions": "^3.0.1",
-    "jest": "^27.3.1",
-    "nodemon": "^2.0.14",
+    "eslint": "^8.26.0",
+    "eslint-plugin-prefer-arrow-functions": "^3.1.4",
+    "jest": "^29.2.1",
+    "nodemon": "^2.0.20",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "should": "^13.2.1",
-    "ts-jest": "^27.0.7",
-    "ts-node": "^10.4.0",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
-    "typescript": "^4.4.4"
+    "typescript": "^4.8.4"
   },
   "scripts": {
     "build": "npm-run-all lint build:clean build:tsc",
     "build:clean": "rimraf lib",
     "build:tsc": "tsc -d",
-    "createtopics": "node setupTopics.js io.restorecommerce.command",
-    "dev": "cross-env NODE_ENV=development npm run createtopics && nodemon --watch './src/**/*.ts' --exec 'ts-node' ./src/start.ts",
+    "dev": "cross-env NODE_ENV=development nodemon --watch './src/**/*.ts' --exec 'ts-node' ./src/start.ts",
     "lint": "eslint src --ext .ts --fix",
-    "pretest": "npm run createtopics",
-    "start": "npm run createtopics && node lib/start.js",
+    "start": "node lib/start.js",
     "test": "jest --runInBand --testTimeout=30000 --forceExit"
   },
   "engines": {
-    "node": ">= 9.2.0"
+    "node": ">= 18.0.0"
   }
 }
