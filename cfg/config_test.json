@@ -20,5 +20,10 @@
     "default-catalog-srv": {
       "address": "localhost:50068"
     }
+  },
+  "database": {
+    "main": {
+      "database": "catalog-srv-test"
+    }
   }
 }
