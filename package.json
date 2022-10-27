@@ -1,6 +1,6 @@
 {
   "name": "@restorecommerce/catalog-srv",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Restore Commerce microservice for catalog and offers",
   "main": "./lib/index.js",
   "author": "n-fuse GmbH",
