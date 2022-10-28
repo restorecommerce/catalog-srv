@@ -2,12 +2,13 @@
 
 ### Base
 FROM node:18.2.0-alpine as base
-
-RUN apk add --no-cache python build-base
+ENV NO_UPDATE_NOTIFIER=true
 
 RUN npm install -g npm
 RUN npm install -g typescript
 
+RUN apk add --no-cache git
+RUN apk add g++ make python3
 USER node
 ARG APP_HOME=/home/node/srv
 WORKDIR $APP_HOME
