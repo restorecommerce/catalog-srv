@@ -1,12 +1,12 @@
 # syntax = docker/dockerfile:experimental
 
 ### Base
-FROM node:14.15.5-alpine as base
+FROM node:18.2.0-alpine as base
 
 RUN apk add --no-cache python build-base
 
 RUN npm install -g npm
-RUN npm install -g typescript@3.4.1
+RUN npm install -g typescript
 
 USER node
 ARG APP_HOME=/home/node/srv

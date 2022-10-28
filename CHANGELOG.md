@@ -1,3 +1,7 @@
+## 0.0.7 (October 28th, 2022)
+
+- up Dockerfile node version
+
 ## 0.0.6 (October 28th, 2022)
 
 - fix production config
