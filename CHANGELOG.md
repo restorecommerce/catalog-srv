@@ -1,3 +1,7 @@
+## 0.0.6 (October 28th, 2022)
+
+- fix production config
+
 ## 0.0.5 (October 27th, 2022)
 
 - migrate to fully typed client, server with full text search
