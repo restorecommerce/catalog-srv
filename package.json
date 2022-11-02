@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/elasticsearch": "^5.0.40",
     "@types/jest": "^29.2.0",
-    "@types/lodash": "^4.14.186",
+    "@types/lodash": "^4.14.187",
     "@types/node": "^18.11.7",
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/eslint-plugin-tslint": "^5.41.0",
