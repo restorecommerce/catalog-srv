@@ -107,6 +107,7 @@ export class Worker {
     const redisConfig = cfg.get('redis');
     redisConfig.db = this.cfg.get('redis:db-indexes:db-subject');
     this.redisClient = createClient(redisConfig);
+    await this.redisClient.connect();
 
     // list of service names
     const serviceNamesCfg = cfg.get('serviceNames');

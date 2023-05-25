@@ -1,3 +1,7 @@
+## 0.0.9 (May 24th, 2023)
+
+- ensure redis is connected
+
 ## 0.0.8 (October 28th, 2022)
 
 - fix Dockerfile
