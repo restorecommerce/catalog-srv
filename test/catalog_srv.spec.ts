@@ -3,11 +3,11 @@ import { createChannel, createClient } from '@restorecommerce/grpc-client';
 import { Worker } from '../src/worker';
 import { createLogger } from '@restorecommerce/logger';
 import { createServiceConfig } from '@restorecommerce/service-config';
-import { ServiceDefinition as manufacturer, ManufacturerList, ServiceClient as ManufacturerClient } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer';
-import { ServiceDefinition as price_group } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group';
-import { ServiceDefinition as product_category } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
-import { ServiceDefinition as product_prototype } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype';
-import { ServiceDefinition as product } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product';
+import { ManufacturerServiceDefinition as manufacturer, ManufacturerList, ManufacturerServiceClient as ManufacturerClient } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer';
+import { PriceGroupServiceDefinition as price_group } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group';
+import { ProductCategoryServiceDefinition as product_category } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
+import { ProductPrototypeServiceDefinition as product_prototype } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype';
+import { ProductServiceDefinition as product } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product';
 import { ReadRequest, Sort_SortOrder, DeleteRequest } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/resource_base';
 
 const cfg = createServiceConfig(process.cwd());
@@ -122,7 +122,7 @@ describe('catalog-srv testing', () => {
 
   it('should read manufacturer resource', async () => {
     const result = await manufacturerSrv.read(ReadRequest.fromPartial({
-      sort: [{
+      sorts: [{
         field: 'name',
         order: Sort_SortOrder.ASCENDING,
       }]
@@ -150,7 +150,7 @@ describe('catalog-srv testing', () => {
     baseValidation(update);
     update.items.should.be.length(2);
     const updatedResult = await manufacturerSrv.read(ReadRequest.fromPartial({
-      sort: [{
+      sorts: [{
         field: 'name',
         order: Sort_SortOrder.ASCENDING,
       }]
@@ -180,7 +180,7 @@ describe('catalog-srv testing', () => {
     baseValidation(upsert);
     upsert.items.should.be.length(2);
     const upsertedResult = await manufacturerSrv.read(ReadRequest.fromPartial({
-      sort: [
+      sorts: [
         {
           field: 'modified',
           order: Sort_SortOrder.ASCENDING,
@@ -200,7 +200,7 @@ describe('catalog-srv testing', () => {
 
   it('should delete manufacturer resource', async () => {
     const result = await manufacturerSrv.read(ReadRequest.fromPartial({
-      sort: [{
+      sorts: [{
         field: 'created',
         order: Sort_SortOrder.ASCENDING,
       }]
@@ -222,7 +222,7 @@ describe('catalog-srv testing', () => {
     deletedResult.operation_status.message.should.equal('success');
 
     const resultAfterDeletion = await manufacturerSrv.read(ReadRequest.fromPartial({
-      sort: [{
+      sorts: [{
         field: 'created',
         order: Sort_SortOrder.ASCENDING,
       }]

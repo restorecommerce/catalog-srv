@@ -1,3 +1,7 @@
+## 0.0.10 (June 2nd, 2023)
+
+- Updated dependencies
+
 ## 0.0.9 (May 24th, 2023)
 
 - ensure redis is connected
