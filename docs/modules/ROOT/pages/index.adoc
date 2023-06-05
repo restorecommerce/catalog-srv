@@ -26,9 +26,9 @@ A Manufacturer resource.
 |===
 |Field |Type |Label |Description
 
-|id |string |required |Manufacturer ID, unique, key
-|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
-|name |string |required |Name
+|id |string |optional |Manufacturer ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |optional |Meta info
+|name |string |optional |Name
 |description |string |optional |description
 |===
 
@@ -41,6 +41,7 @@ A list of Manufacturer resources.
 
 |items |[ ]`io.restorecommerce.manufacturer.Manufacturer` |required |List of Manufacturers
 |total_count |number |optional |number of Manufacturers
+|subject |`io.restorecommerce.auth.Subject` |required |Subject details
 |===
 
 [#api_price_group]
@@ -53,9 +54,9 @@ A PriceGroup resource.
 |===
 |Field |Type |Label |Description
 
-|id |string |required |PriceGroup ID, unique, key
-|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
-|name |string |required |Name
+|id |string |optional |PriceGroup ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |optional |Meta info
+|name |string |optional |Name
 |description |string |optional |description
 |===
 
@@ -68,6 +69,7 @@ A list of PriceGroup resources.
 
 |items |[ ]`io.restorecommerce.price_group.PriceGroup` |required |List of PriceGroups
 |total_count |number |optional |number of PriceGroups
+|subject |`io.restorecommerce.auth.Subject` |required |Subject details
 |===
 
 [#api_product_category]
@@ -85,6 +87,16 @@ A ProductCategory resource.
 |name |string |required |Name
 |description |string |optional |description
 |price_group_id |`io.restorecommerce.price_group.PriceGroup.id` |required |price group identifier
+|image |`io.restorecommerce.image.Image` |optional |Image
+|parent |`io.restorecommerce.product_category.Parent` |optional |Parent reference
+|===
+
+`io.restorecommerce.product_category.Parent`
+
+|===
+|Field |Type |Label |Description
+
+|parent_id |string |optional |parent product category identifier
 |===
 
 A list of ProductCategory resources.
@@ -96,6 +108,7 @@ A list of ProductCategory resources.
 
 |items |[ ]`io.restorecommerce.product_category.ProductCategory` |required |List of Product Categories
 |total_count |number |optional |number of Product Categories
+|subject |`io.restorecommerce.auth.Subject` |required |Subject details
 |===
 
 [#api_product_prototype]
@@ -108,11 +121,11 @@ A ProductPrototype resource.
 |===
 |Field |Type |Label |Description
 
-|id |string |required |ProductPrototype ID, unique, key
-|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
-|name |string |required |Name
+|id |string |optional |ProductPrototype ID, unique, key
+|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |optional |Meta info
+|name |string |optional |Name
 |description |string |optional |description
-|category_id |`io.restorecommerce.product_category.ProductCategory.id` |required |price group identifier
+|category_id |`io.restorecommerce.product_category.ProductCategory.id` |optional |price group identifier
 |===
 
 A list of ProductPrototype resources.
@@ -124,6 +137,7 @@ A list of ProductPrototype resources.
 
 |items |[ ]`io.restorecommerce.product_prototype.ProductPrototype` |required |List of Product Prototypes
 |total_count |number |optional |number of Product Prototypes
+|subject |`io.restorecommerce.auth.Subject` |required |Subject details
 |===
 
 [#api_product]
@@ -138,11 +152,135 @@ A Product resource.
 
 |id |string |required |Product ID, unique, key
 |meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
-|name |string |required |Name
-|description |string |optional |description
-|manufacturer_id |`io.restorecommerce.manufacturer.Manufacturer.id` |required |Manufacturer identifier
-|prototype_id |`io.restorecommerce.product_prototype.ProductPrototype.id` |required |Product Prototype identifier
+|product|`io.restorecommerce.product.IndividualProduct`|optional | Individual Product details
+|bundle|`io.restorecommerce.product.Bundle`|optional | Bundle of Products
+|active|boolean |optional | flag to indicate if product is active
+|tags|[ ] string |optional | product tags
+|associations|[ ] `io.restorecommerce.product.Association`|optional | Product Association
+|data|`google.protobuf.Any`|optional | additional configurable data
 |===
+
+`io.restorecommerce.product.Association`
+
+|===
+|Field |Type |Label |Description
+
+|type |enum |optional | Product Association type Miscellaneous, Accessory or Recommendation
+|tags|[ ] string |optional | product tags
+|data|`google.protobuf.Any`|optional | additional configurable data
+|===
+
+
+`io.restorecommerce.product.IndividualProduct`
+
+|===
+|Field |Type |Label |Description
+
+|name |string |optional | Product name
+|description |string |optional | Product description
+|manufacturer_id |string |optional | Manufacturer identifier
+|taric_code |string |optional | Taric code
+|prototype_id |string |optional | Prodcut Prototype identifier
+|category_id |string |optional | Prodcut Category identifier
+|tax_ids |[ ] string |optional | list of tax identifiers
+|gtin| string |optional | Global Trade Item Number
+|physical|`io.restorecommerce.product.PhysicalProduct` |optional | Physical Product
+|virtual|`io.restorecommerce.product.VirtualProduct` |optional | Virtual Product
+|===
+
+
+`io.restorecommerce.product.PhysicalProduct`
+
+|===
+|Field |Type |Label |Description
+
+|variants |[ ] `io.restorecommerce.product.PhysicalVariant` |optional | Physical Product Variants
+|===
+
+`io.restorecommerce.product.PhysicalVariant`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |optional | Physical variant id
+|name |string |optional | Physical variant name
+|description |string |optional | Physical variant description
+|stock_level | number |optional | Product Stock Level
+|price | number |optional | Product Variant Price
+|sale | boolean |optional | flag to indicate if Product Variant is for sale
+|sale_price | number |optional | Product Variant Sale Price
+|image |[ ] `io.restorecommerce.image.Image` |optional |Product Variant Images
+|File |[ ] `io.restorecommerce.file.File` |optional |Product Variant Files
+|stock_keeping_unit| string |optional | Prodcut Variant SKU
+|template_variant| string |optional | Template Variant
+|package| `io.restorecommerce.product.Package` |optional | Product Package
+|attributes | [ ] `io.restorecommerce.attribute.Attribute` |optional | Product Variant Attributes
+|===
+
+
+`io.restorecommerce.product.Package`
+
+|===
+|Field |Type |Label |Description
+
+|size_in_cm |`io.restorecommerce.geometry.BoundingBox3D` |optional | Package Size
+|weight_in_kg | number | optional | Package Weight in Kg
+|rotatable | boolean | optional | flag to denote if Package is rotatable
+|===
+
+
+`io.restorecommerce.product.VirtualProduct`
+
+|===
+|Field |Type |Label |Description
+
+|variants |[ ] `io.restorecommerce.product.VirtualVariant` |optional | Virtual Product Variants
+|===
+
+`io.restorecommerce.product.VirtualVariant`
+
+|===
+|Field |Type |Label |Description
+
+|id |string |optional | Virtual variant id
+|name |string |optional | Virtual variant name
+|description |string |optional | Virtual variant description
+|stock_level | number |optional | Virtual Stock Level
+|price | number |optional | Virtual Variant Price
+|sale | boolean |optional | flag to indicate if Virtual Variant is for sale
+|sale_price | number |optional | Virtual Variant Sale Price
+|image |[ ] `io.restorecommerce.image.Image` |optional |Virtual Variant Images
+|File |[ ] `io.restorecommerce.file.File` |optional |Virtual Variant Files
+|stock_keeping_unit| string |optional | Virtual Variant SKU
+|template_variant| string |optional | Template Variant
+|attributes | [ ] `io.restorecommerce.attribute.Attribute` |optional | Virtual Variant Attributes
+|===
+
+
+`io.restorecommerce.product.Bundle`
+
+|===
+|Field |Type |Label |Description
+
+|name |string |optional | Bundle name
+|description |string |optional | Bundle description
+|image |[ ] `io.restorecommerce.image.Image` |optional |Bundled Product Images
+|product |[ ] `io.restorecommerce.product.BundleProduct` |optional |Bundled Products
+|price |number |optional |Bundle price
+|pre_packaged | `io.restorecommerce.product.Package` |optional |Bundled pre packaged
+|===
+
+`io.restorecommerce.product.BundleProduct`
+
+|===
+|Field |Type |Label |Description
+
+|prodcut_id |string |optional | Bundled Product identifier
+|variant_id |string |optional | Bundled Variant identifier
+|quantity |number |optional | Bundled Product quantity
+|tax_ratio |number |optional | Discount in relation to the bundle price
+|===
+
 
 A list of Product resources.
 
@@ -155,69 +293,13 @@ A list of Product resources.
 |total_count |number |optional |number of Products
 |===
 
-[#api_bundle]
-=== Bundle
-
-A Bundle resource.
-
-`io.restorecommerce.bundle.Bundle`
-
-|===
-|Field |Type |Label |Description
-
-|id |string |required |Bundle ID, unique, key
-|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
-|name |string |required |Name
-|description |string |optional |description
-|product_ids |[] `io.restorecommerce.product.Product.id` |required |List of Product identifiers
-|===
-
-A list of Bundle resources:
-
-`io.restorecommerce.bundle.BundleList`
-
-|===
-|Field |Type |Label |Description
-
-|items |[ ]`io.restorecommerce.bundle.Bundle` |required |List of Bundles
-|total_count |number |optional |number of Bundles
-|===
-
-[#api_offer]
-=== Offer
-
-A Offer resource.
-
-`io.restorecommerce.offer.Offer`
-
-|===
-|Field |Type |Label |Description
-
-|id |string |required |Offer ID, unique, key
-|meta |https://github.com/restorecommerce/protos/blob/master/io/restorecommerce/meta.proto[`io.restorecommerce.meta.Meta`] |required |Meta info
-|name |string |required |Name
-|bundle_ids |[ ] `io.restorecommerce.bundle.Bundle.id` |one of |list of Bundle Identifiers
-|product_ids |[ ] `io.restorecommerce.product.Product.id` |one of |List of Product identifiers
-|===
-
-A list of Offer resources.
-
-`io.restorecommerce.offer.OfferList`
-
-|===
-|Field |Type |Label |Description
-
-|items |[ ]`io.restorecommerce.offer.Offer` |required |List of Offers
-|total_count |number |optional |number of Offers
-|===
-
 [#api_product_crud]
 ==== CRUD Operations
 
 The microservice exposes the below CRUD operations for creating or
 modifying Product, ProductPrototype, ProductCategory, PriceGroup, Manufacturer, Bundle and Offer resources.
 
-`io.restorecommerce.product.Service`
+`io.restorecommerce.product.ProductService`
 
 |===
 |Method Name |Request Type |Response Type |Description
@@ -229,7 +311,7 @@ modifying Product, ProductPrototype, ProductCategory, PriceGroup, Manufacturer, 
 |Upsert |`io.restorecommerce.product.ProductList` |`io.restorecommerce.product.ProductList` |Create or Update a list of Product resources
 |===
 
-`io.restorecommerce.product_prototype.Service`
+`io.restorecommerce.product_prototype.ProductPrototypeService`
 
 |===
 |Method Name |Request Type |Response Type |Description
@@ -241,7 +323,7 @@ modifying Product, ProductPrototype, ProductCategory, PriceGroup, Manufacturer, 
 |Upsert |`io.restorecommerce.product_prototype.ProductPrototypeList` |`io.restorecommerce.product_prototype.ProductPrototypeList` |Create or Update a list of ProductPrototype resources
 |===
 
-`io.restorecommerce.product_category.Service`
+`io.restorecommerce.product_category.ProductCategoryService`
 
 |===
 |Method Name |Request Type |Response Type |Description
@@ -253,7 +335,7 @@ modifying Product, ProductPrototype, ProductCategory, PriceGroup, Manufacturer, 
 |Upsert |`io.restorecommerce.product_category.ProductCategoryList` |`io.restorecommerce.product_category.ProductCategoryList` |Create or Update a list of ProductCategory resources
 |===
 
-`io.restorecommerce.price_group.Service`
+`io.restorecommerce.price_group.PriceGroupService`
 
 |===
 |Method Name |Request Type |Response Type |Description
@@ -265,7 +347,7 @@ modifying Product, ProductPrototype, ProductCategory, PriceGroup, Manufacturer, 
 |Upsert |`io.restorecommerce.price_group.PriceGroupList` |`io.restorecommerce.price_group.PriceGroupList` |Create or Update a list of PriceGroup resources
 |===
 
-`io.restorecommerce.manufacturer.Service`
+`io.restorecommerce.manufacturer.ManufacturerService`
 
 |===
 |Method Name |Request Type |Response Type |Description
@@ -275,30 +357,6 @@ modifying Product, ProductPrototype, ProductCategory, PriceGroup, Manufacturer, 
 |Update |`io.restorecommerce.manufacturer.ManufacturerList` |`io.restorecommerce.manufacturer.ManufacturerList` |Update a list of Manufacturer resources
 |Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of Manufacturer resources
 |Upsert |`io.restorecommerce.manufacturer.ManufacturerList` |`io.restorecommerce.manufacturer.ManufacturerList` |Create or Update a list of Manufacturer resources
-|===
-
-`io.restorecommerce.bundle.Service`
-
-|===
-|Method Name |Request Type |Response Type |Description
-
-|Create |`io.restorecommerce.bundle.BundleList` |`io.restorecommerce.bundle.BundleList` |Create a list of Bundle resources
-|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.bundle.BundleList` |Read a list of Bundle resources
-|Update |`io.restorecommerce.bundle.BundleList` |`io.restorecommerce.bundle.BundleList` |Update a list of Bundle resources
-|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of Bundle resources
-|Upsert |`io.restorecommerce.bundle.BundleList` |`io.restorecommerce.bundle.BundleList` |Create or Update a list of Bundle resources
-|===
-
-`io.restorecommerce.offer.Service`
-
-|===
-|Method Name |Request Type |Response Type |Description
-
-|Create |`io.restorecommerce.offer.OfferList` |`io.restorecommerce.offer.OfferList` |Create a list of Offer resources
-|Read |`io.restorecommerce.resourcebase.ReadRequest` |`io.restorecommerce.offer.OfferList` |Read a list of Offer resources
-|Update |`io.restorecommerce.offer.OfferList` |`io.restorecommerce.offer.OfferList` |Update a list of Offer resources
-|Delete |`io.restorecommerce.resourcebase.DeleteRequest` |Empty |Delete a list of Offer resources
-|Upsert |`io.restorecommerce.offer.OfferList` |`io.restorecommerce.offer.OfferList` |Create or Update a list of Offer resources
 |===
 
 For the detailed protobuf message structure of
