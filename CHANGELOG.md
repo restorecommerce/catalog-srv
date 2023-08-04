@@ -1,3 +1,8 @@
+## 1.0.1 (August 04th, 2023)
+
+- Updated dependencies
+- fix test spec
+
 ## 1.0.0 (July 28th, 2023)
 
 - owner and role attributes object restructuring
