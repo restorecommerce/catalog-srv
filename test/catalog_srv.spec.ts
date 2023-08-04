@@ -116,8 +116,8 @@ describe('catalog-srv testing', () => {
     const result = await manufacturerSrv.create(ManufacturerList.fromPartial({ items: listOfManufacturers }), {});
     baseValidation(result);
     result.items.should.be.length(listOfManufacturers.length);
-    result.items[0].payload.name.should.equal(listOfManufacturers[0].name);
-    result.items[1].payload.name.should.equal(listOfManufacturers[1].name);
+    should.equal(result?.items[0]?.payload?.name, listOfManufacturers[0].name);
+    should.equal(result?.items[1]?.payload?.name, listOfManufacturers[1].name);
   });
 
   it('should read manufacturer resource', async () => {
@@ -129,8 +129,8 @@ describe('catalog-srv testing', () => {
     }), {});
     baseValidation(result);
     result.items.should.be.length(listOfManufacturers.length);
-    result.items[0].payload.name.should.equal(listOfManufacturers[0].name);
-    result.items[1].payload.name.should.equal(listOfManufacturers[1].name);
+    should.equal(result.items[0].payload?.name, listOfManufacturers[0].name);
+    should.equal(result.items[1].payload?.name, listOfManufacturers[1].name);
   });
 
   it('should update manufacturer resource', async () => {
@@ -157,8 +157,8 @@ describe('catalog-srv testing', () => {
     }), {});
     baseValidation(updatedResult);
     updatedResult.items.should.be.length(2);
-    updatedResult.items[0].payload.name.should.equal('Manufacturer 3');
-    updatedResult.items[1].payload.name.should.equal('Manufacturer 4');
+    should.equal(updatedResult.items[0].payload?.name, 'Manufacturer 3');
+    should.equal(updatedResult.items[1].payload?.name, 'Manufacturer 4');
   });
 
   it('should upsert manufacturer resource', async () => {
@@ -193,9 +193,9 @@ describe('catalog-srv testing', () => {
     }));
     baseValidation(upsertedResult);
     upsertedResult.items.should.be.length(listOfManufacturers.length + 1);
-    upsertedResult.items[0].payload.name.should.equal('Manufacturer 4');
-    upsertedResult.items[1].payload.name.should.equal('Manufacturer 5');
-    upsertedResult.items[2].payload.name.should.equal('Manufacturer 6');
+    should.equal(upsertedResult.items[0].payload?.name, 'Manufacturer 4');
+    should.equal(upsertedResult.items[1].payload?.name, 'Manufacturer 5');
+    should.equal(upsertedResult.items[2].payload?.name, 'Manufacturer 6');
   });
 
   it('should delete manufacturer resource', async () => {
@@ -208,7 +208,7 @@ describe('catalog-srv testing', () => {
     baseValidation(result);
 
     const deleteIDs = {
-      ids: result.items.map(i => i.payload.id)
+      ids: result.items.map(i => i.payload?.id) as string[]
     };
 
     const deletedResult = await manufacturerSrv.delete(DeleteRequest.fromPartial(deleteIDs), {});
@@ -218,8 +218,8 @@ describe('catalog-srv testing', () => {
       statusObj.code.should.equal(200);
       statusObj.message.should.equal('success');
     });
-    deletedResult.operation_status.code.should.equal(200);
-    deletedResult.operation_status.message.should.equal('success');
+    should.equal(deletedResult.operation_status?.code, 200);
+    should.equal(deletedResult.operation_status?.message, 'success');
 
     const resultAfterDeletion = await manufacturerSrv.read(ReadRequest.fromPartial({
       sorts: [{
@@ -232,7 +232,7 @@ describe('catalog-srv testing', () => {
 
     const orgDeletionResult = await manufacturerSrv.delete({ collection: true });
     should.exist(orgDeletionResult);
-    deletedResult.operation_status.code.should.equal(200);
-    deletedResult.operation_status.message.should.equal('success');
+    should.equal(deletedResult.operation_status?.code, 200);
+    should.equal(deletedResult.operation_status?.message, 'success');
   });
 });
