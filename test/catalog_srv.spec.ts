@@ -89,9 +89,11 @@ describe('catalog-srv testing', () => {
   let manufacturerSrv: ManufacturerClient;
   let worker: Worker;
 
-  let baseValidation = (result: any) => {
+  let baseValidation = (result: any, itemsShouldexist: boolean = true) => {
     should.exist(result);
-    should.exist(result.items);
+    if(itemsShouldexist) {
+      should.exist(result.items);
+    }
     should.exist(result.operation_status);
     should.exist(result.operation_status.code);
     should.exist(result.operation_status.message);
@@ -227,12 +229,12 @@ describe('catalog-srv testing', () => {
         order: Sort_SortOrder.ASCENDING,
       }]
     }), {});
-    baseValidation(resultAfterDeletion);
-    resultAfterDeletion.items.should.be.length(0);
+    baseValidation(resultAfterDeletion, false);
+    should.not.exist(resultAfterDeletion.items);
 
     const orgDeletionResult = await manufacturerSrv.delete({ collection: true });
     should.exist(orgDeletionResult);
-    should.equal(deletedResult.operation_status?.code, 200);
-    should.equal(deletedResult.operation_status?.message, 'success');
+    should.equal(orgDeletionResult.operation_status?.code, 200);
+    should.equal(orgDeletionResult.operation_status?.message, 'success');
   });
 });
