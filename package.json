@@ -1,6 +1,6 @@
 {
   "name": "@restorecommerce/catalog-srv",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Restore Commerce microservice for catalog and offers",
   "main": "./lib/index.js",
   "author": "n-fuse GmbH",
@@ -55,7 +55,7 @@
     "build": "npm-run-all lint build:clean build:tsc",
     "build:clean": "rimraf lib",
     "build:tsc": "tsc -d",
-    "dev": "cross-env NODE_ENV=development nodemon --watch './src/**/*.ts' --exec 'ts-node' ./src/start.ts",
+    "dev": "cross-env NODE_ENV=development nodemon --watch './src/**/*.ts' --exec 'ts-node' ./src/worker.ts",
     "lint": "eslint src --ext .ts --fix",
     "start": "node lib/start.js",
     "test": "jest --runInBand --testTimeout=30000 --forceExit"

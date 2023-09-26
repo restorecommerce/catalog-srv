@@ -6,6 +6,7 @@ import { ProductPrototypeServiceImplementation, ProductPrototypeList, ProductPro
 import { ProductCategoryServiceImplementation, ProductCategoryList, ProductCategoryListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
 import { PriceGroupServiceImplementation, PriceGroupList, PriceGroupListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group';
 import { ManufacturerServiceImplementation, ManufacturerList, ManufacturerListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer';
+import { CodeServiceImplementation, CodeList, CodeListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/code';
 
 export class ProductService extends ServiceBase<ProductListResponse, ProductList> implements ProductServiceImplementation {
   constructor(topic: Topic, db: DatabaseProvider, cfg: any, logger: any, enableEvents: boolean) {
@@ -99,5 +100,24 @@ export class ManufacturerService extends ServiceBase<ManufacturerListResponse, M
       }
     }
     super('manufacturer', topic, logger, new ResourcesAPIBase(db, 'manufacturers', resourceFieldConfig), enableEvents);
+  }
+}
+
+export class CodeService extends ServiceBase<CodeListResponse, CodeList> implements CodeServiceImplementation {
+  constructor(topic: Topic, db: DatabaseProvider, cfg: any, logger: any, enableEvents: boolean) {
+    let resourceFieldConfig;
+    if (cfg.get('fieldHandlers')) {
+      resourceFieldConfig = cfg.get('fieldHandlers');
+      resourceFieldConfig['bufferFields'] = resourceFieldConfig?.bufferFields?.roles;
+      if (cfg.get('fieldHandlers:timeStampFields')) {
+        resourceFieldConfig['timeStampFields'] = [];
+        for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
+          if (timeStampFiledConfig.entities.includes('codes')) {
+            resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
+          }
+        }
+      }
+    }
+    super('code', topic, logger, new ResourcesAPIBase(db, 'codes', resourceFieldConfig), enableEvents);
   }
 }

@@ -1,3 +1,7 @@
+## 1.2.0 (September 26th, 2023)
+
+- added unit codes as a resource type
+
 ## 1.1.0 (September 21st, 2023)
 
 - made all fields in proto files optional
