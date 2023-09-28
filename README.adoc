@@ -1,7 +1,6 @@
 = Catalog Service
 
-https://github.com/restorecommerce/catalog-srv /actions/workflows/build.yaml[image:https://img.shields.io/github/actions/workflow/status/restorecommerce/catalog-srv /build.yaml?style=flat-square[Build Status]]
-https://travis-ci.org/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/travis/restorecommerce/catalog-srv/master.svg?style=flat-square[Build Status]]
+https://github.com/restorecommerce/catalog-srv/actions/workflows/build.yaml[image:https://img.shields.io/github/actions/workflow/status/restorecommerce/catalog-srv/build.yaml?style=flat-square[Build Status]]
 https://depfu.com/repos/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/depfu/dependencies/github/restorecommerce/catalog-srv?style=flat-square[Dependencies]]
 https://coveralls.io/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/coveralls/github/restorecommerce/catalog-srv/master.svg?style=flat-square[Coverage Status]]
 
