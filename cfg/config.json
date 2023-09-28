@@ -14,7 +14,7 @@
         "product_category",
         "product_prototype",
         "product",
-        "code"
+        "unit_code"
       ],
       "customQueries": [
         {
@@ -42,7 +42,7 @@
           "product_category",
           "product_prototype",
           "product",
-          "code"
+          "unit_code"
         ]
       },
       "entities": [
@@ -51,7 +51,7 @@
         "product_category",
         "product_prototype",
         "product",
-        "code"
+        "unit_code"
       ]
     }
   },
@@ -148,7 +148,7 @@
     "product_category": "io-restorecommerce-product_category-srv",
     "product_prototype": "io-restorecommerce-product_prototype-srv",
     "product": "io-restorecommerce-product-srv",
-    "code": "io-restorecommerce-code-srv",
+    "unit_code": "io-restorecommerce-code-srv",
     "health": "grpc-health-v1"
   },
   "fieldHandlers": {
@@ -164,7 +164,7 @@
           "product_categorys",
           "product_prototypes",
           "products",
-          "codes"
+          "unit_codes"
         ]
       }
     ]

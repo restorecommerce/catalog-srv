@@ -103,7 +103,7 @@ export class ManufacturerService extends ServiceBase<ManufacturerListResponse, M
   }
 }
 
-export class CodeService extends ServiceBase<CodeListResponse, CodeList> implements CodeServiceImplementation {
+export class UnitCodeService extends ServiceBase<CodeListResponse, CodeList> implements CodeServiceImplementation {
   constructor(topic: Topic, db: DatabaseProvider, cfg: any, logger: any, enableEvents: boolean) {
     let resourceFieldConfig;
     if (cfg.get('fieldHandlers')) {
@@ -118,6 +118,6 @@ export class CodeService extends ServiceBase<CodeListResponse, CodeList> impleme
         }
       }
     }
-    super('code', topic, logger, new ResourcesAPIBase(db, 'codes', resourceFieldConfig), enableEvents);
+    super('unit_code', topic, logger, new ResourcesAPIBase(db, 'unit_codes', resourceFieldConfig), enableEvents);
   }
 }

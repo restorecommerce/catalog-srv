@@ -1,3 +1,7 @@
+## 1.2.1 (September 28th, 2023)
+
+- rename codes to unit_codes
+
 ## 1.2.0 (September 26th, 2023)
 
 - added unit codes as a resource type
