@@ -1,3 +1,7 @@
+## 1.2.2 (September 28th, 2023)
+
+- fix codes service timestamp fields
+
 ## 1.2.1 (September 28th, 2023)
 
 - rename codes to unit_codes

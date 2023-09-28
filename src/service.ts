@@ -112,7 +112,7 @@ export class UnitCodeService extends ServiceBase<CodeListResponse, CodeList> imp
       if (cfg.get('fieldHandlers:timeStampFields')) {
         resourceFieldConfig['timeStampFields'] = [];
         for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
-          if (timeStampFiledConfig.entities.includes('codes')) {
+          if (timeStampFiledConfig.entities.includes('unit_codes')) {
             resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
           }
         }
