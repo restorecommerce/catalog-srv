@@ -1,5 +1,6 @@
 = Catalog Service
 
+https://github.com/restorecommerce/catalog-srv /actions/workflows/build.yaml[image:https://img.shields.io/github/actions/workflow/status/restorecommerce/catalog-srv /build.yaml?style=flat-square[Build Status]]
 https://travis-ci.org/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/travis/restorecommerce/catalog-srv/master.svg?style=flat-square[Build Status]]
 https://depfu.com/repos/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/depfu/dependencies/github/restorecommerce/catalog-srv?style=flat-square[Dependencies]]
 https://coveralls.io/github/restorecommerce/catalog-srv?branch=master[image:https://img.shields.io/coveralls/github/restorecommerce/catalog-srv/master.svg?style=flat-square[Coverage Status]]
@@ -9,6 +10,6 @@ A microservice for catalog and offer management.
 Please consult the documentation for using it:
 
 - *link:https://docs.restorecommerce.io/catalog-srv/index.html[Usage]*
-- *link:https://docs.restorecommerce.io/architecture/index.html[General Architecture]*
+- *link:https://docs.restorecommerce.io/architecture/index.html[Restorecommerce Architecture]*
 
 Part of link:https://github.com/restorecommerce[Restorecommerce].
