@@ -102,22 +102,3 @@ export class ManufacturerService extends ServiceBase<ManufacturerListResponse, M
     super('manufacturer', topic, logger, new ResourcesAPIBase(db, 'manufacturers', resourceFieldConfig), enableEvents);
   }
 }
-
-export class UnitCodeService extends ServiceBase<CodeListResponse, CodeList> implements CodeServiceImplementation {
-  constructor(topic: Topic, db: DatabaseProvider, cfg: any, logger: any, enableEvents: boolean) {
-    let resourceFieldConfig;
-    if (cfg.get('fieldHandlers')) {
-      resourceFieldConfig = cfg.get('fieldHandlers');
-      resourceFieldConfig['bufferFields'] = resourceFieldConfig?.bufferFields?.roles;
-      if (cfg.get('fieldHandlers:timeStampFields')) {
-        resourceFieldConfig['timeStampFields'] = [];
-        for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
-          if (timeStampFiledConfig.entities.includes('unit_codes')) {
-            resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
-          }
-        }
-      }
-    }
-    super('unit_code', topic, logger, new ResourcesAPIBase(db, 'unit_codes', resourceFieldConfig), enableEvents);
-  }
-}

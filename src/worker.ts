@@ -13,15 +13,14 @@ import { protoMetadata as priceGroupMeta, PriceGroupServiceDefinition as price_g
 import { protoMetadata as productCategoryMeta, ProductCategoryServiceDefinition as product_category } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
 import { protoMetadata as productPorotoTypeMeta, ProductPrototypeServiceDefinition as product_prototype } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype';
 import { protoMetadata as productMeta, ProductServiceDefinition as product } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product';
-import { protoMetadata as unitCodeMeta, UnitCodeServiceDefinition as unit_code } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/unit_code';
 import { protoMetadata as commandInterfaceMeta, CommandInterfaceServiceDefinition as CommandInterfaceServiceDefinition } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/commandinterface';
 import { BindConfig } from '@restorecommerce/chassis-srv/lib/microservice/transport/provider/grpc';
 import { HealthDefinition } from '@restorecommerce/rc-grpc-clients/dist/generated-server/grpc/health/v1/health';
 import { ServerReflectionService } from 'nice-grpc-server-reflection';
 
-registerProtoMeta(manufacturerMeta, priceGroupMeta, productCategoryMeta, productPorotoTypeMeta, productMeta, unitCodeMeta, commandInterfaceMeta);
+registerProtoMeta(manufacturerMeta, priceGroupMeta, productCategoryMeta, productPorotoTypeMeta, productMeta, commandInterfaceMeta);
 
-const ServiceDefinitions: any = [manufacturer, price_group, product_category, product_prototype, product, unit_code];
+const ServiceDefinitions: any = [manufacturer, price_group, product_category, product_prototype, product];
 
 const capitalized = (entity: string): string => {
   const labels = entity.split('_').map((element) => {
@@ -166,7 +165,6 @@ export class Worker {
       { descriptor: productCategoryMeta.fileDescriptor },
       { descriptor: productPorotoTypeMeta.fileDescriptor },
       { descriptor: productMeta.fileDescriptor },
-      { descriptor: unitCodeMeta.fileDescriptor },
       { descriptor: commandInterfaceMeta.fileDescriptor }
     ]);
     await server.bind(reflectionServiceName, {

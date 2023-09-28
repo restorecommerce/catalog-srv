@@ -1,3 +1,7 @@
+## 1.2.3 (September 29th, 2023)
+
+- remove unit_codes
+
 ## 1.2.2 (September 28th, 2023)
 
 - fix codes service timestamp fields
