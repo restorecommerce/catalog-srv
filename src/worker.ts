@@ -66,7 +66,14 @@ export class Worker {
   redisClient: RedisClientType;
   constructor(cfg?: any) {
     this.cfg = cfg || createServiceConfig(process.cwd());
-    this.logger = createLogger(this.cfg.get('logger'));
+    const loggerCfg = this.cfg.get('logger');
+    if (loggerCfg) {
+      loggerCfg.esTransformer = (msg) => {
+        msg.fields = JSON.stringify(msg.fields);
+        return msg;
+      };
+    }
+    this.logger = createLogger(loggerCfg);
     this.topics = {};
     this.services = {};
   }
