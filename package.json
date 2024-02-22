@@ -62,6 +62,8 @@
     "dev": "cross-env NODE_ENV=development nodemon --watch './src/**/*.ts' --exec node --loader ts-node/esm ./src/start.ts",
     "lint": "eslint src --ext .ts --fix",
     "start": "node lib/start.js",
+    "lcov-report": "c8 report --reporter=lcov",
+    "coveralls": "c8 report --reporter=text-lcov | coveralls",
     "mocha": "cross-env NODE_ENV=test mocha --timeout 10000 --full-trace --exit --trace-warnings --exit",
     "test": "npm run lint && c8 --reporter=text npm run mocha"
   },
