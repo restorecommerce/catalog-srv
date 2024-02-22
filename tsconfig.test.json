@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "."
+    "outDir": "test"
   },
   "extends": "./tsconfig.json",
   "include": [

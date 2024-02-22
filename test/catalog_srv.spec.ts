@@ -1,14 +1,22 @@
-import * as should from 'should';
+import should from 'should';
 import { createChannel, createClient } from '@restorecommerce/grpc-client';
-import { Worker } from '../src/worker';
+import { Worker } from '../src/worker.js';
 import { createLogger } from '@restorecommerce/logger';
 import { createServiceConfig } from '@restorecommerce/service-config';
-import { ManufacturerServiceDefinition as manufacturer, ManufacturerList, ManufacturerServiceClient as ManufacturerClient } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer';
-import { PriceGroupServiceDefinition as price_group } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group';
-import { ProductCategoryServiceDefinition as product_category } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
-import { ProductPrototypeServiceDefinition as product_prototype } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype';
-import { ProductServiceDefinition as product } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product';
-import { ReadRequest, Sort_SortOrder, DeleteRequest } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/resource_base';
+import {
+  ManufacturerServiceDefinition as manufacturer, ManufacturerList,
+  ManufacturerServiceClient as ManufacturerClient
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer.js';
+import { PriceGroupServiceDefinition as price_group }
+  from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group.js';
+import { ProductCategoryServiceDefinition as product_category }
+  from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category.js';
+import { ProductPrototypeServiceDefinition as product_prototype }
+  from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype.js';
+import { ProductServiceDefinition as product }
+  from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product.js';
+import { ReadRequest, Sort_SortOrder, DeleteRequest }
+  from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/resource_base.js';
 
 const cfg = createServiceConfig(process.cwd());
 const logger = createLogger(cfg.get('logger'));
@@ -91,7 +99,7 @@ describe('catalog-srv testing', () => {
 
   let baseValidation = (result: any, itemsShouldexist: boolean = true) => {
     should.exist(result);
-    if(itemsShouldexist) {
+    if (itemsShouldexist) {
       should.exist(result.items);
     }
     should.exist(result.operation_status);
@@ -101,7 +109,7 @@ describe('catalog-srv testing', () => {
     result.operation_status.message.should.equal('success');
   };
 
-  beforeAll(async () => {
+  before(async function (): Promise<any> {
     worker = new Worker(cfg);
     await worker.start();
 
@@ -110,7 +118,7 @@ describe('catalog-srv testing', () => {
     manufacturerSrv = options.microservice.service[options.microservice.mapClients.get('manufacturer')];
   });
 
-  afterAll(async () => {
+  after(async () => {
     await worker.stop();
   });
 

@@ -1,12 +1,26 @@
 import { ResourcesAPIBase, ServiceBase, } from '@restorecommerce/resource-base-interface';
 import { DatabaseProvider } from '@restorecommerce/chassis-srv';
 import { Topic } from '@restorecommerce/kafka-client';
-import { ProductServiceImplementation, ProductList, ProductListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product';
-import { ProductPrototypeServiceImplementation, ProductPrototypeList, ProductPrototypeListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype';
-import { ProductCategoryServiceImplementation, ProductCategoryList, ProductCategoryListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
-import { PriceGroupServiceImplementation, PriceGroupList, PriceGroupListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group';
-import { ManufacturerServiceImplementation, ManufacturerList, ManufacturerListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer';
-import { CodeServiceImplementation, CodeList, CodeListResponse } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/code';
+import {
+  ProductServiceImplementation, ProductList,
+  ProductListResponse
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product.js';
+import {
+  ProductPrototypeServiceImplementation, ProductPrototypeList,
+  ProductPrototypeListResponse
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype.js';
+import {
+  ProductCategoryServiceImplementation, ProductCategoryList,
+  ProductCategoryListResponse
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category.js';
+import {
+  PriceGroupServiceImplementation, PriceGroupList,
+  PriceGroupListResponse
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group.js';
+import {
+  ManufacturerServiceImplementation, ManufacturerList,
+  ManufacturerListResponse
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer.js';
 
 export class ProductService extends ServiceBase<ProductListResponse, ProductList> implements ProductServiceImplementation {
   constructor(topic: Topic, db: DatabaseProvider, cfg: any, logger: any, enableEvents: boolean) {

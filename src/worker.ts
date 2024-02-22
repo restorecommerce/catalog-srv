@@ -1,21 +1,37 @@
 import { createServiceConfig } from '@restorecommerce/service-config';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import { Events, registerProtoMeta } from '@restorecommerce/kafka-client';
 import { createLogger } from '@restorecommerce/logger';
 import * as chassis from '@restorecommerce/chassis-srv';
-import * as catalogServices from './service';
-import { CatalogCommandInterface } from './commandInterface';
+import * as catalogServices from './service.js';
+import { CatalogCommandInterface } from './commandInterface.js';
 import { RedisClientType, createClient } from 'redis';
-import { Arango } from '@restorecommerce/chassis-srv/lib/database/provider/arango/base';
+import { Arango } from '@restorecommerce/chassis-srv/lib/database/provider/arango/base.js';
 import { Logger } from 'winston';
-import { protoMetadata as manufacturerMeta, ManufacturerServiceDefinition as manufacturer } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer';
-import { protoMetadata as priceGroupMeta, PriceGroupServiceDefinition as price_group } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group';
-import { protoMetadata as productCategoryMeta, ProductCategoryServiceDefinition as product_category } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category';
-import { protoMetadata as productPorotoTypeMeta, ProductPrototypeServiceDefinition as product_prototype } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype';
-import { protoMetadata as productMeta, ProductServiceDefinition as product } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product';
-import { protoMetadata as commandInterfaceMeta, CommandInterfaceServiceDefinition as CommandInterfaceServiceDefinition } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/commandinterface';
-import { BindConfig } from '@restorecommerce/chassis-srv/lib/microservice/transport/provider/grpc';
-import { HealthDefinition } from '@restorecommerce/rc-grpc-clients/dist/generated-server/grpc/health/v1/health';
+import {
+  protoMetadata as manufacturerMeta,
+  ManufacturerServiceDefinition as manufacturer
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/manufacturer.js';
+import {
+  protoMetadata as priceGroupMeta,
+  PriceGroupServiceDefinition as price_group
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group.js';
+import {
+  protoMetadata as productCategoryMeta,
+  ProductCategoryServiceDefinition as product_category
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_category.js';
+import {
+  protoMetadata as productPorotoTypeMeta,
+  ProductPrototypeServiceDefinition as product_prototype
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype.js';
+import { protoMetadata as productMeta, ProductServiceDefinition as product }
+  from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product.js';
+import {
+  protoMetadata as commandInterfaceMeta,
+  CommandInterfaceServiceDefinition as CommandInterfaceServiceDefinition
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/commandinterface.js';
+import { BindConfig } from '@restorecommerce/chassis-srv/lib/microservice/transport/provider/grpc/index.js';
+import { HealthDefinition } from '@restorecommerce/rc-grpc-clients/dist/generated-server/grpc/health/v1/health.js';
 import { ServerReflectionService } from 'nice-grpc-server-reflection';
 
 registerProtoMeta(manufacturerMeta, priceGroupMeta, productCategoryMeta, productPorotoTypeMeta, productMeta, commandInterfaceMeta);
@@ -200,20 +216,4 @@ export class Worker {
     await this.events.stop();
     await this.offsetStore.stop();
   }
-}
-
-if (require.main === module) {
-  const worker = new Worker();
-  const logger = worker.logger;
-  worker.start().then().catch((err) => {
-    logger.error('startup error', { code: err.code, message: err.message, stack: err.stack });
-    process.exit(1);
-  });
-
-  process.on('SIGINT', () => {
-    worker.stop().then().catch((err) => {
-      logger.error('shutdown error', { code: err.code, message: err.message, stack: err.stack });
-      process.exit(1);
-    });
-  });
 }
