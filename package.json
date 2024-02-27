@@ -58,10 +58,10 @@
   "scripts": {
     "build": "npm-run-all lint build:clean build:tsc",
     "build:clean": "rimraf lib",
-    "build:tsc": "esbuild ./src/start.ts --bundle --platform=node --outfile=lib/start.js --minify --tree-shaking=true --sourcemap=inline",
+    "build:tsc": "esbuild ./src/start.ts --bundle --platform=node --outfile=lib/start.cjs --minify --tree-shaking=true --sourcemap=inline",
     "dev": "cross-env NODE_ENV=development nodemon --watch './src/**/*.ts' --exec node --loader ts-node/esm ./src/start.ts",
     "lint": "eslint src --ext .ts --fix",
-    "start": "node lib/start.js",
+    "start": "node lib/start.cjs",
     "lcov-report": "c8 report --reporter=lcov",
     "coveralls": "c8 report --reporter=text-lcov | coveralls",
     "mocha": "cross-env NODE_ENV=test mocha --timeout 10000 --full-trace --exit --trace-warnings --exit",
