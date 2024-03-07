@@ -1,4 +1,13 @@
-### 1.3.3 (November 26th, 2023)
+## 1.4.1 (March 7th, 2024)
+
+- up deps
+- add tax-ids to product.variants
+
+## 1.4.0 (February 29th, 2024)
+
+- esbuild support
+
+## 1.3.3 (November 26th, 2023)
 
 - removed deprecated method in chassis-srv (collection.load)
 - fixed logger transformer

@@ -1,5 +1,4 @@
 import { createServiceConfig } from '@restorecommerce/service-config';
-import * as _ from 'lodash-es';
 import { Events, registerProtoMeta } from '@restorecommerce/kafka-client';
 import { createLogger } from '@restorecommerce/logger';
 import * as chassis from '@restorecommerce/chassis-srv';
@@ -42,7 +41,7 @@ const capitalized = (entity: string): string => {
   const labels = entity.split('_').map((element) => {
     return element.charAt(0).toUpperCase() + element.substr(1);
   });
-  return _.join(labels, '');
+  return labels.join('');
 };
 
 const makeResourceConfig = (cfg: any, namespace: string, entity: string): any => {
@@ -143,7 +142,7 @@ export class Worker {
       await cis.command(msg, context);
     };
 
-    const topicTypes = _.keys(kafkaCfg.topics);
+    const topicTypes = Object.keys(kafkaCfg.topics);
     for (let topicType of topicTypes) {
       const topicName = kafkaCfg.topics[topicType].topic;
       this.topics[topicType] = await events.topic(topicName);
