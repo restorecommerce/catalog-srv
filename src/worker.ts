@@ -2,7 +2,7 @@ import { createServiceConfig } from '@restorecommerce/service-config';
 import { Events, registerProtoMeta } from '@restorecommerce/kafka-client';
 import { createLogger } from '@restorecommerce/logger';
 import * as chassis from '@restorecommerce/chassis-srv';
-import * as catalogServices from './service.js';
+import { getService } from './service.js';
 import { CatalogCommandInterface } from './commandInterface.js';
 import { RedisClientType, createClient } from 'redis';
 import { Arango } from '@restorecommerce/chassis-srv/lib/database/provider/arango/base.js';
@@ -35,11 +35,11 @@ import { ServerReflectionService } from 'nice-grpc-server-reflection';
 
 registerProtoMeta(manufacturerMeta, priceGroupMeta, productCategoryMeta, productPorotoTypeMeta, productMeta, commandInterfaceMeta);
 
-const ServiceDefinitions: any = [manufacturer, price_group, product_category, product_prototype, product];
+const ServiceDefinitions = [manufacturer, price_group, product_category, product_prototype, product];
 
 const capitalized = (entity: string): string => {
   const labels = entity.split('_').map((element) => {
-    return element.charAt(0).toUpperCase() + element.substr(1);
+    return element.charAt(0).toUpperCase() + element.slice(1);
   });
   return labels.join('');
 };
@@ -83,7 +83,7 @@ export class Worker {
     this.cfg = cfg || createServiceConfig(process.cwd());
     const loggerCfg = this.cfg.get('logger');
     if (loggerCfg) {
-      loggerCfg.esTransformer = (msg) => {
+      loggerCfg.esTransformer = (msg: any) => {
         msg.fields = JSON.stringify(msg.fields);
         return msg;
       };
@@ -163,9 +163,16 @@ export class Worker {
       const serviceName = serviceNamesCfg[entity];
       if (serviceName) {
         const capitalizedName = capitalized(entity);
-        this.services[entity] = new catalogServices[`${capitalizedName}Service`](
-          this.topics[`${entity}s.resources`], db, cfg, logger, isEventsEnabled);
-        const serviceDef = ServiceDefinitions.filter((obj) => obj.fullName.split('.')[2] === entity)[0];
+        this.services[entity] = new (getService(`${capitalizedName}Service`))(
+          this.topics[`${entity}s.resources`],
+          db,
+          cfg,
+          logger,
+          isEventsEnabled
+        );
+        const serviceDef = ServiceDefinitions.find(
+          (obj) => obj.fullName.split('.')[2] === entity
+        );
         await server.bind(serviceName, {
           implementation: this.services[entity],
           service: serviceDef

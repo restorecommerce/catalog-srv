@@ -116,3 +116,21 @@ export class ManufacturerService extends ServiceBase<ManufacturerListResponse, M
     super('manufacturer', topic, logger, new ResourcesAPIBase(db, 'manufacturers', resourceFieldConfig), enableEvents);
   }
 }
+
+export const getService = (name: string): {
+  new(
+    topic: Topic,
+    db: DatabaseProvider,
+    cfg: any, logger: any,
+    enableEvents: boolean
+  ): {}
+} => {
+  switch (name) {
+    case 'ProductService': return ProductService;
+    case 'ProductPrototypeService': return ProductPrototypeService;
+    case 'ProductCategoryService': return ProductCategoryService;
+    case 'PriceGroupService': return PriceGroupService;
+    case 'ManufacturerService': return ManufacturerService;
+    default: throw 'Unknown Service!';
+  }
+}
