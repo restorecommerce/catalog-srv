@@ -119,11 +119,11 @@ export class ManufacturerService extends ServiceBase<ManufacturerListResponse, M
 
 export const getService = (name: string): {
   new(
-    topic: Topic,
-    db: DatabaseProvider,
-    cfg: any, logger: any,
-    enableEvents: boolean
-  ): {}
+  topic: Topic,
+  db: DatabaseProvider,
+  cfg: any, logger: any,
+  enableEvents: boolean
+  ): {};
 } => {
   switch (name) {
     case 'ProductService': return ProductService;
@@ -133,4 +133,4 @@ export const getService = (name: string): {
     case 'ManufacturerService': return ManufacturerService;
     default: throw 'Unknown Service!';
   }
-}
+};
