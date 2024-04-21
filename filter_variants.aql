@@ -1,7 +1,7 @@
 let variants = node.product.variants
 let found = (
     for variant in variants
-    filter variant.id == @variantIDValue
+    filter variant.id == @customArguments.variantIDValue
     limit 1
     return true
 )
