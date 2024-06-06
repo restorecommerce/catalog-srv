@@ -82,12 +82,6 @@ export class Worker {
   constructor(cfg?: any) {
     this.cfg = cfg || createServiceConfig(process.cwd());
     const loggerCfg = this.cfg.get('logger');
-    if (loggerCfg) {
-      loggerCfg.esTransformer = (msg: any) => {
-        msg.fields = JSON.stringify(msg.fields);
-        return msg;
-      };
-    }
     this.logger = createLogger(loggerCfg);
     this.topics = {};
     this.services = {};
