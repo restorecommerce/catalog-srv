@@ -30,7 +30,7 @@ export class ProductService extends ServiceBase<ProductListResponse, ProductList
       resourceFieldConfig['bufferFields'] = resourceFieldConfig?.bufferFields?.roles;
       if (cfg.get('fieldHandlers:timeStampFields')) {
         resourceFieldConfig['timeStampFields'] = [];
-        for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
+        for (const timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
           if (timeStampFiledConfig.entities.includes('products')) {
             resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
           }
@@ -49,7 +49,7 @@ export class ProductPrototypeService extends ServiceBase<ProductPrototypeListRes
       resourceFieldConfig['bufferFields'] = resourceFieldConfig?.bufferFields?.roles;
       if (cfg.get('fieldHandlers:timeStampFields')) {
         resourceFieldConfig['timeStampFields'] = [];
-        for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
+        for (const timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
           if (timeStampFiledConfig.entities.includes('product_prototypes')) {
             resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
           }
@@ -68,7 +68,7 @@ export class ProductCategoryService extends ServiceBase<ProductCategoryListRespo
       resourceFieldConfig['bufferFields'] = resourceFieldConfig?.bufferFields?.roles;
       if (cfg.get('fieldHandlers:timeStampFields')) {
         resourceFieldConfig['timeStampFields'] = [];
-        for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
+        for (const timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
           if (timeStampFiledConfig.entities.includes('product_categorys')) {
             resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
           }
@@ -87,7 +87,7 @@ export class PriceGroupService extends ServiceBase<PriceGroupListResponse, Price
       resourceFieldConfig['bufferFields'] = resourceFieldConfig?.bufferFields?.roles;
       if (cfg.get('fieldHandlers:timeStampFields')) {
         resourceFieldConfig['timeStampFields'] = [];
-        for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
+        for (const timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
           if (timeStampFiledConfig.entities.includes('price_groups')) {
             resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
           }
@@ -106,7 +106,7 @@ export class ManufacturerService extends ServiceBase<ManufacturerListResponse, M
       resourceFieldConfig['bufferFields'] = resourceFieldConfig?.bufferFields?.roles;
       if (cfg.get('fieldHandlers:timeStampFields')) {
         resourceFieldConfig['timeStampFields'] = [];
-        for (let timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
+        for (const timeStampFiledConfig of cfg.get('fieldHandlers:timeStampFields')) {
           if (timeStampFiledConfig.entities.includes('manufacturers')) {
             resourceFieldConfig['timeStampFields'].push(...timeStampFiledConfig.fields);
           }
@@ -123,7 +123,7 @@ export const getService = (name: string): {
   db: DatabaseProvider,
   cfg: any, logger: any,
   enableEvents: boolean
-  ): {};
+  ): object;
 } => {
   switch (name) {
     case 'ProductService': return ProductService;

@@ -61,7 +61,7 @@ const makeResourceConfig = (cfg: any, namespace: string, entity: string): any =>
   };
 
   const messageObject = capitalized(entity);
-  for (let event of crudEvents) {
+  for (const event of crudEvents) {
     kafkaCfg[`${entity}${event}`] = {
       messageObject: `${prefixesCfg.serviceNamePrefix}${entity}.${messageObject}`
     };
@@ -100,11 +100,11 @@ export class Worker {
     logger.verbose('Setting up topics');
     // update 'evenets:kafka' to include all the resources Created, Modified and Deleted events
     const resourcesCfg = cfg.get('resources');
-    for (let namespace in resourcesCfg) {
+    for (const namespace in resourcesCfg) {
       const resourceCfg = resourcesCfg[namespace];
 
       const entities = resourceCfg.entities || [];
-      for (let entity of entities) {
+      for (const entity of entities) {
         makeResourceConfig(cfg, namespace, entity);
       }
     }
@@ -137,14 +137,14 @@ export class Worker {
     };
 
     const topicTypes = Object.keys(kafkaCfg.topics);
-    for (let topicType of topicTypes) {
+    for (const topicType of topicTypes) {
       const topicName = kafkaCfg.topics[topicType].topic;
       this.topics[topicType] = await events.topic(topicName);
       const offSetValue = await this.offsetStore.getOffset(topicName);
       logger.info('subscribing to topic with offset value', topicName, offSetValue);
       if (kafkaCfg.topics[topicType].events) {
         const eventNames = kafkaCfg.topics[topicType].events;
-        for (let eventName of eventNames) {
+        for (const eventName of eventNames) {
           await this.topics[topicType].on(eventName,
             eventListener, { startingOffset: offSetValue });
         }
@@ -153,7 +153,7 @@ export class Worker {
 
     const collections = cfg.get('database:main:collections');
 
-    for (let entity of collections) {
+    for (const entity of collections) {
       const serviceName = serviceNamesCfg[entity];
       if (serviceName) {
         const capitalizedName = capitalized(entity);
