@@ -119,10 +119,10 @@ export class ManufacturerService extends ServiceBase<ManufacturerListResponse, M
 
 export const getService = (name: string): {
   new(
-  topic: Topic,
-  db: DatabaseProvider,
-  cfg: any, logger: any,
-  enableEvents: boolean
+    topic: Topic,
+    db: DatabaseProvider,
+    cfg: any, logger: any,
+    enableEvents: boolean
   ): object;
 } => {
   switch (name) {

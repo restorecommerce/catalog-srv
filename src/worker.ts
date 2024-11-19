@@ -33,9 +33,22 @@ import { BindConfig } from '@restorecommerce/chassis-srv/lib/microservice/transp
 import { HealthDefinition } from '@restorecommerce/rc-grpc-clients/dist/generated-server/grpc/health/v1/health.js';
 import { ServerReflectionService } from 'nice-grpc-server-reflection';
 
-registerProtoMeta(manufacturerMeta, priceGroupMeta, productCategoryMeta, productPorotoTypeMeta, productMeta, commandInterfaceMeta);
+registerProtoMeta(
+  manufacturerMeta,
+  priceGroupMeta,
+  productCategoryMeta,
+  productPorotoTypeMeta,
+  productMeta,
+  commandInterfaceMeta
+);
 
-const ServiceDefinitions = [manufacturer, price_group, product_category, product_prototype, product];
+const ServiceDefinitions = [
+  manufacturer,
+  price_group,
+  product_category,
+  product_prototype,
+  product
+];
 
 const capitalized = (entity: string): string => {
   const labels = entity.split('_').map((element) => {
@@ -110,7 +123,7 @@ export class Worker {
     }
     const events = new Events(cfg.get('events:kafka'), logger);
     await events.start();
-    this.offsetStore = new chassis.OffsetStore(events, cfg, logger);
+    this.offsetStore = new chassis.OffsetStore(events as any, cfg, logger);
 
     // Enable events firing for resource api using config
     let isEventsEnabled = cfg.get('events:enableEvents');
@@ -183,7 +196,7 @@ export class Worker {
     // Add reflection service
     const reflectionServiceName = serviceNamesCfg.reflection;
     const reflectionService = chassis.buildReflectionService([
-      { descriptor: manufacturerMeta.fileDescriptor },
+      { descriptor: manufacturerMeta.fileDescriptor as any },
       { descriptor: priceGroupMeta.fileDescriptor },
       { descriptor: productCategoryMeta.fileDescriptor },
       { descriptor: productPorotoTypeMeta.fileDescriptor },
@@ -207,7 +220,7 @@ export class Worker {
 
     this.events = events;
     this.server = server;
-    this.logger.info('Server started successfully');
+    this.logger.info('Server started');
   }
 
   async stop(): Promise<any> {
