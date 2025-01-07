@@ -17,7 +17,7 @@
     }
   },
   "client": {
-    "default-catalog-srv": {
+    "catalog-srv": {
       "address": "localhost:50068"
     },
     "acs-srv": {

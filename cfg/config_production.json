@@ -27,8 +27,11 @@
     }
   },
   "client": {
-    "default-catalog-srv": {
-      "address": "0.0.0.0:50051"
+    "acs-srv": {
+      "address": "access-control-srv:50051"
+    },
+    "user": {
+      "address": "identity-srv:50051"
     }
   },
   "server": {

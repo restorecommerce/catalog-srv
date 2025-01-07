@@ -62,7 +62,7 @@
       "serviceNamePrefix": "io.restorecommerce.",
       "serviceConfigPrefix": "io-restorecommerce-",
       "resources": {
-        "default-catalog-srv": [
+        "catalog-srv": [
           "manufacturer",
           "price_group",
           "product_category",
@@ -80,8 +80,11 @@
     }
   },
   "client": {
-    "default-catalog-srv": {
-      "address": "localhost:50068"
+    "acs-srv": {
+      "address": "localhost:50061"
+    },
+    "user": {
+      "address": "localhost:50051"
     }
   },
   "redis": {

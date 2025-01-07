@@ -53,7 +53,7 @@ const getClientResourceServices = async () => {
     mapClients: new Map()
   };
   const resources = cfg.get('resources');
-  const defaultConfig = cfg.get('client:default-catalog-srv');
+  const defaultConfig = cfg.get('client:catalog-srv');
   for (let resourceType in resources) {
     const resourceCfg = resources[resourceType];
     const serviceNamePrefix = resourceCfg.serviceNamePrefix;
