@@ -1,12 +1,17 @@
-import { createServiceConfig } from '@restorecommerce/service-config';
+import {
+  createServiceConfig,
+  type ServiceConfig
+} from '@restorecommerce/service-config';
 import { Events, registerProtoMeta } from '@restorecommerce/kafka-client';
-import { createLogger } from '@restorecommerce/logger';
+import {
+  createLogger,
+  type Logger,
+} from '@restorecommerce/logger';
 import * as chassis from '@restorecommerce/chassis-srv';
-import { getService } from './service.js';
+import { getService } from './services/index.js';
 import { CatalogCommandInterface } from './commandInterface.js';
 import { RedisClientType, createClient } from 'redis';
 import { Arango } from '@restorecommerce/chassis-srv/lib/database/provider/arango/base.js';
-import { Logger } from 'winston';
 import {
   protoMetadata as manufacturerMeta,
   ManufacturerServiceDefinition as manufacturer
@@ -23,12 +28,16 @@ import {
   protoMetadata as productPorotoTypeMeta,
   ProductPrototypeServiceDefinition as product_prototype
 } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype.js';
-import { protoMetadata as productMeta, ProductServiceDefinition as product }
-  from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product.js';
+import {
+  protoMetadata as productMeta, ProductServiceDefinition as product
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product.js';
 import {
   protoMetadata as commandInterfaceMeta,
   CommandInterfaceServiceDefinition as CommandInterfaceServiceDefinition
 } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/commandinterface.js';
+import {
+  protoMetadata as baseMeta,
+} from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/resource_base.js';
 import { BindConfig } from '@restorecommerce/chassis-srv/lib/microservice/transport/provider/grpc/index.js';
 import { HealthDefinition } from '@restorecommerce/rc-grpc-clients/dist/generated-server/grpc/health/v1/health.js';
 import { ServerReflectionService } from 'nice-grpc-server-reflection';
@@ -39,7 +48,8 @@ registerProtoMeta(
   productCategoryMeta,
   productPorotoTypeMeta,
   productMeta,
-  commandInterfaceMeta
+  commandInterfaceMeta,
+  baseMeta,
 );
 
 const ServiceDefinitions = [
@@ -86,16 +96,17 @@ const makeResourceConfig = (cfg: any, namespace: string, entity: string): any =>
 export class Worker {
   events: Events;
   server: any;
-  logger: Logger;
-  cfg: any;
   topics: any;
   offsetStore: chassis.OffsetStore;
   services: any;
   redisClient: RedisClientType;
-  constructor(cfg?: any) {
-    this.cfg = cfg || createServiceConfig(process.cwd());
-    const loggerCfg = this.cfg.get('logger');
-    this.logger = createLogger(loggerCfg);
+  
+  constructor(
+    protected readonly cfg?: ServiceConfig,
+    protected readonly logger?: Logger,
+  ) {
+    this.cfg = cfg ?? createServiceConfig(process.cwd());
+    this.logger = logger ?? createLogger(this.cfg.get('logger'));
     this.topics = {};
     this.services = {};
   }

@@ -7,5 +7,9 @@
     "node_modules",
     "lib",
     "doc"
-  ]
+  ],
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
 }

@@ -19,6 +19,32 @@
   "client": {
     "default-catalog-srv": {
       "address": "localhost:50068"
+    },
+    "acs-srv": {
+      "address": "localhost:50161",
+      "mock": {
+        "protoPath": "io/restorecommerce/access_control.proto",
+        "packageName": "io.restorecommerce.access_control",
+        "serviceName": "AccessControlService",
+        "protoLoadOptions": {
+          "includeDirs": [
+            "node_modules/@restorecommerce/protos/"
+          ]
+        }
+      }
+    },
+    "user": {
+      "address": "localhost:50162",
+      "mock": {
+        "protoPath": "io/restorecommerce/user.proto",
+        "packageName": "io.restorecommerce.user",
+        "serviceName": "UserService",
+        "protoLoadOptions": {
+          "includeDirs": [
+            "node_modules/@restorecommerce/protos/"
+          ]
+        }
+      }
     }
   },
   "database": {
