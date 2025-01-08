@@ -1,5 +1,11 @@
 {
   "logger": {
+    "console": {
+      "handleExceptions": false,
+      "level": "silly",
+      "colorize": true,
+      "prettyPrint": true
+    },
     "fieldOptions": {
       "maskFields": [
         "password",
