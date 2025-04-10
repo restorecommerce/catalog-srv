@@ -116,7 +116,17 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
       []
     ) ?? [];
 
-    super(entity, topic, logger, new ResourcesAPIBase(db, collection, resourceFieldConfig), enableEvents);
+    super(
+      entity,
+      topic,
+      logger,
+      new ResourcesAPIBase(
+        db,
+        collection,
+        resourceFieldConfig,
+      ),
+      enableEvents
+    );
     this.operation_status_codes = {
       ...this.operation_status_codes,
       ...cfg.get('operationStatusCodes'),
@@ -190,7 +200,7 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
   @resolves_subject()
   @injects_meta_data()
   @access_controlled_function({
-    action: AuthZAction.CREATE,
+    action: AuthZAction.MODIFY,
     operation: Operation.isAllowed,
     context: ACSContextFactory<O, I>,
     resource: DefaultResourceFactory(),

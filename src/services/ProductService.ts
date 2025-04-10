@@ -3,10 +3,14 @@ import { Topic } from '@restorecommerce/kafka-client';
 import {
   ProductServiceImplementation, ProductList,
   ProductListResponse,
+  DeepPartial,
+  IndividualProductVariantListRequest,
+  IndividualProductVariantListResponse,
 } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product.js';
 import {
  AccessControlledServiceBase
 } from '../experimental/AccessControlledServiceBase.js'
+import { CallContext } from 'nice-grpc-common';
 
 export class ProductService
   extends AccessControlledServiceBase<ProductListResponse, ProductList>
@@ -20,5 +24,9 @@ export class ProductService
     enableEvents: boolean
   ) {
     super('product', 'products', topic, db, cfg, logger, enableEvents);
+  }
+  
+  getVariant(request: IndividualProductVariantListRequest, context: CallContext): Promise<DeepPartial<IndividualProductVariantListResponse>> {
+    throw new Error('Method not implemented.');
   }
 }
