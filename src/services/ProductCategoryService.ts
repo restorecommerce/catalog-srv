@@ -17,8 +17,10 @@ export class ProductCategoryService
     db: DatabaseProvider,
     cfg: any,
     logger: any,
-    enableEvents: boolean
+    enableEvents: boolean,
+    resourceName: string = 'product_category',
+    collectionName: string = 'product_categories',
   ) {
-    super('product_category', 'product_categorys', topic, db, cfg, logger, enableEvents);
+    super(resourceName, topic, db, cfg, logger, enableEvents, collectionName);
   }
 }

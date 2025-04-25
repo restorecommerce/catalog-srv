@@ -17,8 +17,10 @@ export class PriceGroupService
     db: DatabaseProvider,
     cfg: any,
     logger: any,
-    enableEvents: boolean
+    enableEvents: boolean,
+    resourceName: string = 'price_group',
+    collectionName: string = 'price_groups',
   ) {
-    super('price_group', 'price_groups', topic, db, cfg, logger, enableEvents);
+    super(resourceName, topic, db, cfg, logger, enableEvents, collectionName);
   }
 }

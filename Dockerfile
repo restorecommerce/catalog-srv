@@ -9,10 +9,9 @@ WORKDIR $APP_HOME
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 
-RUN npm ci
-
 COPY --chown=node:node . .
 
+RUN npm ci
 RUN npm run build
 
 
@@ -28,7 +27,8 @@ WORKDIR $APP_HOME
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 
-COPY --chown=node:node . $APP_HOME
+COPY --chown=node:node ./cfg $APP_HOME/cfg
+COPY --chown=node:node ./queries $APP_HOME/queries
 COPY --chown=node:node --from=build $APP_HOME/lib $APP_HOME/lib
 
 EXPOSE 50051
@@ -36,4 +36,4 @@ EXPOSE 50051
 USER root
 USER node
 
-CMD [ "npm", "start" ]
+CMD [ "node", "./lib/start.cjs" ]

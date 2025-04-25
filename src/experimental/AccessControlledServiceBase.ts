@@ -1,3 +1,6 @@
+import {
+  type CallContext,
+} from 'nice-grpc-common';
 import { 
   ResourcesAPIBase,
   ServiceBase,
@@ -26,6 +29,7 @@ import {
   ReadRequest,
   type ResourceList,
   type ResourceListResponse,
+  ResourceResponse,
   ServiceImplementation,
 } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/resource_base.js';
 import {
@@ -58,7 +62,7 @@ export function DefaultResourceFactory<T extends ResourceList>(
   return async (
     self: any,
     request: T,
-    context: any,
+    context: CallContext,
   ) => (resourceNames?.length ? resourceNames : [self.name])?.map(
     resourceName => ({
       resource: resourceName,
@@ -88,42 +92,47 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
   };
 
   constructor(
-    entity: string,
-    collection: string,
+    resourceName: string,
     topic: Topic,
     db: DatabaseProvider,
     cfg: ServiceConfig,
-    logger: Logger,
-    enableEvents: boolean
+    logger?: Logger,
+    enableEvents?: boolean,
+    collectionName?: string,
   ) {
-    const resourceFieldConfig = cfg.get('fieldHandlers');
-    resourceFieldConfig.bufferedFields = resourceFieldConfig.bufferedFields?.reduce(
-      (a: any[], b: any) => {
-        if (b.entities?.includes(collection)) {
-          a.push(...(b.fields ?? []))
-        }
-        return a;
-      },
-      []
-    ) ?? [];
-    resourceFieldConfig.timeStampFields = resourceFieldConfig.timeStampFields?.reduce(
-      (a: any[], b: any) => {
-        if (b.entities?.includes(collection)) {
-          a.push(...(b.fields ?? []))
-        }
-        return a;
-      },
-      []
-    ) ?? [];
-
+    collectionName ??= resourceName + 's';
+    const fieldHandlers = cfg.get('fieldHandlers');
+    fieldHandlers.bufferedFields = fieldHandlers.bufferedFields?.flatMap(
+      (item: any) => typeof(item) === 'string'
+        ? item
+        : item.entities?.includes(collectionName)
+        ? item.fields
+        : item.entities
+        ? []
+        : item.fields
+    );
+    fieldHandlers.timeStampFields = fieldHandlers.timeStampFields?.flatMap(
+      (item: any) => typeof(item) === 'string'
+        ? item
+        : item.entities?.includes(collectionName)
+        ? item.fields
+        : item.entities
+        ? []
+        : item.fields
+    );
+    const graph = cfg.get('graph');
     super(
-      entity,
-      topic,
+      resourceName,
+      topic as any,
       logger,
       new ResourcesAPIBase(
         db,
-        collection,
-        resourceFieldConfig,
+        collectionName,
+        fieldHandlers,
+        graph?.vertices?.[collectionName],
+        graph?.name,
+        logger,
+        resourceName
       ),
       enableEvents
     );
@@ -133,10 +142,79 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
     };
   }
 
+  protected catchStatusError<T extends ResourceResponse>(e?: any, item?: T): T {
+    item ??= {} as T;
+    item.status = {
+      id: item?.payload?.id,
+      code: Number.isInteger(e?.code) ? e.code : 500,
+      message: e?.message ?? e?.details ?? (e ? JSON.stringify(e) : 'Unknown Error!')
+    };
+    this.logger?.warn(e?.stack ?? item.status.message, item);
+    return item;
+  }
+
+  protected catchOperationError<T extends ResourceListResponse>(e?: any, response?: T): T {
+    response ??= {} as T;
+    response.operation_status = {
+      code: Number.isInteger(e?.code) ? e.code : 500,
+      message: e?.message ?? e?.details ?? (e ? JSON.stringify(e) : 'Unknown Error!'),
+    };
+    this.logger?.error(e?.stack ?? response.operation_status.message, response);
+    return response;
+  }
+
+  protected async superRead(
+    request: ReadRequest,
+    context?: CallContext,
+  ): Promise<DeepPartial<O>> {
+    return await super.read(request, context);
+  }
+
+  protected async superCreate(
+    request: I,
+    context?: CallContext,
+  ): Promise<DeepPartial<O>> {
+    return await super.create(
+      request,
+      context,
+    );
+  }
+
+  protected async superUpdate(
+    request: I,
+    context?: CallContext,
+  ): Promise<DeepPartial<O>> {
+    return await super.update(
+      request,
+      context,
+    );
+  }
+
+  protected async superUpsert(
+    request: I,
+    context?: CallContext,
+  ): Promise<DeepPartial<O>> {
+    return await super.upsert(
+      request,
+      context,
+    );
+  }
+
+  protected async superDelete(
+    request: DeleteRequest,
+    context?: CallContext,
+  ): Promise<DeleteResponse> {
+    return await super.delete(
+      request,
+      context,
+    );
+  }
+
   public async get(
     ids: string[],
     subject?: Subject,
-    context?: any,
+    context?: CallContext,
+    bypassACS = false,
   ): Promise<DeepPartial<O>> {
     ids = [...new Set(ids)].filter(id => id);
     if (ids.length > 1000) {
@@ -160,9 +238,15 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
           type: Filter_ValueType.ARRAY
         }]
       }],
+      limit: ids.length,
       subject
     });
-    return await super.read(request, context);
+    if (bypassACS) {
+      return await this.superRead(request, context);
+    }
+    else {
+      return await this.read(request, context);
+    }
   }
 
   @resolves_subject()
@@ -177,9 +261,9 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
   })
   public override async create(
     request: I,
-    context?: any
+    context?: CallContext
   ): Promise<DeepPartial<O>> {
-    return await super.create(request, context);
+    return await this.superCreate(request, context);
   }
 
   @access_controlled_function({
@@ -192,15 +276,15 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
   })
   public override async read(
     request: ReadRequest,
-    context?: any,
+    context?: CallContext,
   ): Promise<DeepPartial<O>> {
-    return await super.read(request, context);
+    return await this.superRead(request, context);
   }
 
   @resolves_subject()
   @injects_meta_data()
   @access_controlled_function({
-    action: AuthZAction.MODIFY,
+    action: AuthZAction.CREATE,
     operation: Operation.isAllowed,
     context: ACSContextFactory<O, I>,
     resource: DefaultResourceFactory(),
@@ -209,9 +293,9 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
   })
   public override async update(
     request: I,
-    context?: any,
+    context?: CallContext,
   ): Promise<DeepPartial<O>> {
-    return super.update(request, context);
+    return await this.superUpdate(request, context);
   }
 
   @resolves_subject()
@@ -226,9 +310,9 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
   })
   public override async upsert(
     request: I,
-    context?: any,
+    context?: CallContext,
   ): Promise<DeepPartial<O>> {
-    return super.upsert(request, context);
+    return await this.superUpsert(request, context);
   }
 
   @resolves_subject()
@@ -242,8 +326,8 @@ export class AccessControlledServiceBase<O extends ResourceListResponse, I exten
   })
   public override async delete(
     request: DeleteRequest,
-    context?: any,
+    context?: CallContext,
   ): Promise<DeleteResponse> {
-    return super.delete(request, context);
+    return this.superDelete(request, context);
   }
 }

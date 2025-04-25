@@ -43,13 +43,13 @@ import { HealthDefinition } from '@restorecommerce/rc-grpc-clients/dist/generate
 import { ServerReflectionService } from 'nice-grpc-server-reflection';
 
 registerProtoMeta(
+  baseMeta,
   manufacturerMeta,
   priceGroupMeta,
   productCategoryMeta,
   productPorotoTypeMeta,
   productMeta,
   commandInterfaceMeta,
-  baseMeta,
 );
 
 const ServiceDefinitions = [
@@ -60,31 +60,22 @@ const ServiceDefinitions = [
   product
 ];
 
-const capitalized = (entity: string): string => {
-  const labels = entity.split('_').map((element) => {
-    return element.charAt(0).toUpperCase() + element.slice(1);
-  });
-  return labels.join('');
-};
+const CrudEvents = ['Created', 'Modified', 'Deleted'];
+const capitalized = (entity: string): string => entity.split('_').map(
+  element => element.charAt(0).toUpperCase() + element.slice(1)
+).join('');
 
-const makeResourceConfig = (cfg: any, namespace: string, entity: string): any => {
+const makeResourceConfig = (cfg: any, namespace: string, entity: string, collection: string): any => {
   const kafkaCfg = cfg.get('events:kafka');
-  // const serverCfg = cfg.get('server');
-
-  // const crudMethods = ['create', 'update', 'upsert', 'read', 'delete'];
-  const crudEvents = ['Created', 'Modified', 'Deleted'];
-
   const prefixesCfg = cfg.get(`resources:${namespace}`); // e.g: restorecommerce
-  const topicName = `${prefixesCfg.serviceNamePrefix}${entity}s.resources`;
 
-
-  kafkaCfg.topics = kafkaCfg.topics || {};
-  kafkaCfg.topics[`${entity}s.resources`] = {
-    topic: topicName
+  kafkaCfg.topics = kafkaCfg.topics ?? {};
+  kafkaCfg.topics[`${collection}.resources`] = {
+    topic: `${prefixesCfg.serviceNamePrefix}${collection}.resources`
   };
 
   const messageObject = capitalized(entity);
-  for (const event of crudEvents) {
+  for (const event of CrudEvents) {
     kafkaCfg[`${entity}${event}`] = {
       messageObject: `${prefixesCfg.serviceNamePrefix}${entity}.${messageObject}`
     };
@@ -126,24 +117,17 @@ export class Worker {
     const resourcesCfg = cfg.get('resources');
     for (const namespace in resourcesCfg) {
       const resourceCfg = resourcesCfg[namespace];
-
-      const entities = resourceCfg.entities || [];
-      for (const entity of entities) {
-        makeResourceConfig(cfg, namespace, entity);
+      const resources = resourceCfg.resources ?? [];
+      for (const entry of resources) {
+        makeResourceConfig(cfg, namespace, entry.resourceName, entry.collectionName);
       }
     }
     const events = new Events(cfg.get('events:kafka'), logger);
     await events.start();
     this.offsetStore = new chassis.OffsetStore(events as any, cfg, logger);
 
-    // Enable events firing for resource api using config
-    let isEventsEnabled = cfg.get('events:enableEvents');
-    if (isEventsEnabled === true) {
-      isEventsEnabled = true;
-    } else { // Undefined means events not enabled
-      isEventsEnabled = false;
-    }
-
+    // Enable events firing for resource api using config (check for string because of env)
+    const isEventsEnabled = cfg.get('events:enableEvents').toString() === 'true';
     const redisConfig = cfg.get('redis');
     redisConfig.db = this.cfg.get('redis:db-indexes:db-subject');
     this.redisClient = createClient(redisConfig);
@@ -152,53 +136,55 @@ export class Worker {
     // list of service names
     const serviceNamesCfg = cfg.get('serviceNames');
     const server = new chassis.Server(cfg.get('server'), logger);
-
     const cis = new CatalogCommandInterface(server, cfg, logger, events, this.redisClient);
-
     const eventListener = async (msg: any, context: any, config: any, eventName: string): Promise<any> => {
       // command events
       await cis.command(msg, context);
     };
 
-    const topicTypes = Object.keys(kafkaCfg.topics);
-    for (const topicType of topicTypes) {
-      const topicName = kafkaCfg.topics[topicType].topic;
-      this.topics[topicType] = await events.topic(topicName);
+    for (const [topicKey, topicValue] of Object.entries<any>(kafkaCfg.topics)) {
+      const topicName = topicValue.topic;
+      this.topics[topicKey] = await events.topic(topicName);
       const offSetValue = await this.offsetStore.getOffset(topicName);
       logger.info('subscribing to topic with offset value', topicName, offSetValue);
-      if (kafkaCfg.topics[topicType].events) {
-        const eventNames = kafkaCfg.topics[topicType].events;
+      if (kafkaCfg.topics[topicKey].events) {
+        const eventNames = kafkaCfg.topics[topicKey].events;
         for (const eventName of eventNames) {
-          await this.topics[topicType].on(eventName,
-            eventListener, { startingOffset: offSetValue });
+          await this.topics[topicKey].on(
+            eventName,
+            eventListener,
+            {
+              startingOffset: offSetValue
+            }
+          );
         }
       }
     }
 
-    const collections = cfg.get('database:main:collections');
-
-    for (const entity of collections) {
-      const serviceName = serviceNamesCfg[entity];
-      if (serviceName) {
-        const capitalizedName = capitalized(entity);
-        this.services[entity] = new (getService(`${capitalizedName}Service`))(
-          this.topics[`${entity}s.resources`],
-          db,
-          cfg,
-          logger,
-          isEventsEnabled
-        );
+    for (const namespace in resourcesCfg) {
+      for (const entry of resourcesCfg[namespace]?.resources ?? []) {
+        const fullServiceName = serviceNamesCfg[entry.serviceName] ?? entry.serviceName;
         const serviceDef = ServiceDefinitions.find(
-          (obj) => obj.fullName.split('.')[2] === entity
+          (obj) => obj.fullName.split('.')[2] === entry.serviceName
         );
-        await server.bind(serviceName, {
-          implementation: this.services[entity],
-          service: serviceDef
-        } as BindConfig<any>);
+        if (fullServiceName && serviceDef) {
+          const capitalizedName = capitalized(entry.serviceName);
+          this.services[entry.serviceName] = new (getService(`${capitalizedName}Service`))(
+            this.topics[`${entry.collectionName}.resources`],
+            db,
+            cfg,
+            logger,
+            isEventsEnabled,
+            entry.resourceName,
+            entry.collectionName,
+          );
+          await server.bind(fullServiceName, {
+            implementation: this.services[entry.serviceName],
+            service: serviceDef
+          } as BindConfig<any>);
+        }
       }
     }
-
-    // await server.bind(serviceNamesCfg.cis, cis);
     await server.bind(serviceNamesCfg.cis, {
       service: CommandInterfaceServiceDefinition,
       implementation: cis

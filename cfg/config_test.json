@@ -2,7 +2,7 @@
   "logger": {
     "console": {
       "handleExceptions": false,
-      "level": "silly",
+      "level": "error",
       "colorize": true,
       "prettyPrint": true
     }
@@ -17,9 +17,6 @@
     }
   },
   "client": {
-    "catalog-srv": {
-      "address": "localhost:50068"
-    },
     "acs-srv": {
       "address": "localhost:50161",
       "mock": {
@@ -45,11 +42,26 @@
           ]
         }
       }
+    },
+    "manufacturer": {
+      "address": "localhost:50168"
+    },
+    "product": {
+      "address": "localhost:50168"
     }
   },
   "database": {
     "main": {
       "database": "catalog-srv-test"
     }
+  },
+  "server": {
+    "transports": [
+      {
+        "name": "grpcCatalogTest",
+        "provider": "grpc",
+        "addr": "localhost:50168"
+      }
+    ]
   }
 }

@@ -17,8 +17,10 @@ export class ManufacturerService
     db: DatabaseProvider,
     cfg: any,
     logger: any,
-    enableEvents: boolean
+    enableEvents: boolean,
+    resourceName: string = 'manufacturer',
+    collectionName: string = 'manufacturers',
   ) {
-    super('manufacturer', 'manufacturers', topic, db, cfg, logger, enableEvents);
+    super(resourceName, topic, db, cfg, logger, enableEvents, collectionName);
   }
 }

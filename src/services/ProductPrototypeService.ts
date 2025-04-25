@@ -17,8 +17,10 @@ export class ProductPrototypeService
     db: DatabaseProvider,
     cfg: any,
     logger: any,
-    enableEvents: boolean
+    enableEvents: boolean,
+    resourceName: string = 'product_prototype',
+    collectionName: string = 'product_prototypes',
   ) {
-    super('product_prototype', 'product_prototypes', topic, db, cfg, logger, enableEvents);
+    super(resourceName, topic, db, cfg, logger, enableEvents, collectionName);
   }
 }

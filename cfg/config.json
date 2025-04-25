@@ -13,22 +13,10 @@
         "request.token",
         "items.[0].password"
       ],
-      "bufferFields": [
-      ],
       "omitFields": [
-        "context",
-        "custom_arguments",
-        "subject.token",
-        "token",
-        "tokens",
-        "items.[0].tokens",
-        "messages.[0].tokens",
-        "request.items.[0].tokens",
-        "response.payload.token",
-        "response.payload.tokens",
-        "request.subject.token",
-        "users.items.[0].payload.tokens",
-        "response.items.[0].payload.tokens"
+        "request.context.subject.value.data",
+        "request.context.security.value.data",
+        "request.context.resources.[0].value.data"
       ]
     }
   },
@@ -42,21 +30,17 @@
       "retries": 6,
       "delay": 30000,
       "collections": [
-        "manufacturer",
-        "price_group",
-        "product_category",
-        "product_prototype",
-        "product"
+        "manufacturers",
+        "price_groups",
+        "product_categories",
+        "product_prototypes",
+        "products",
+        "product_variants"
       ],
       "customQueries": [
         {
-          "path": "filter_ownership.aql",
+          "path": "queries/filter_ownership.aql",
           "name": "filterByOwnership",
-          "type": "filter"
-        },
-        {
-          "path": "filter_variants.aql",
-          "name": "filterByVariants",
           "type": "filter"
         }
       ]
@@ -66,22 +50,30 @@
     "restorecommerce": {
       "protoPathPrefix": "io/restorecommerce/",
       "serviceNamePrefix": "io.restorecommerce.",
-      "serviceConfigPrefix": "io-restorecommerce-",
-      "resources": {
-        "catalog-srv": [
-          "manufacturer",
-          "price_group",
-          "product_category",
-          "product_prototype",
-          "product"
-        ]
-      },
-      "entities": [
-        "manufacturer",
-        "price_group",
-        "product_category",
-        "product_prototype",
-        "product"
+      "serviceConfigPrefix": "io-restore-",
+      "resourcesDeletedMessage": "io.restorecommerce.resourcebase.Deleted",
+      "resources": [
+        {
+          "serviceName": "manufacturer",
+          "resourceName": "manufacturer",
+          "collectionName": "manufacturers"
+        },{
+          "serviceName": "price_group",
+          "resourceName": "price_group",
+          "collectionName": "price_proups"
+        },{
+          "serviceName": "product_category",
+          "resourceName": "product_category",
+          "collectionName": "product_categories"
+        },{
+          "serviceName": "product_prototype",
+          "resourceName": "product_prototype",
+          "collectionName": "product_prototypes"
+        },{
+          "serviceName": "product",
+          "resourceName": "product",
+          "collectionName": "products"
+        }
       ]
     }
   },
@@ -224,6 +216,7 @@
     "product_category": "io-restorecommerce-product_category-srv",
     "product_prototype": "io-restorecommerce-product_prototype-srv",
     "product": "io-restorecommerce-product-srv",
+    "product_variant": "io-restorecommerce-product-variant-srv",
     "health": "grpc-health-v1"
   },
   "fieldHandlers": {
@@ -238,9 +231,32 @@
           "price_groups",
           "product_categorys",
           "product_prototypes",
-          "products"
+          "products",
+          "product_variants"
         ]
       }
     ]
+  },
+  "errors": {
+    "INVALID_CREDENTIALS": {
+      "code": 401,
+      "message": "Invalid credentials"
+    },
+    "USER_NOT_LOGGED_IN": {
+      "code": 401,
+      "message": "Invalid authentication context, please log in first"
+    },
+    "ACTION_NOT_ALLOWED": {
+      "code": 403,
+      "message": "Action not allowed on this resource"
+    }
+  },
+  "defaults": {
+    "ProductVariantService": {
+      "disabled": false,
+      "delimiter": ":",
+      "resourceName": "product_variant",
+      "collectionName": "product_variants"
+    }
   }
 }
