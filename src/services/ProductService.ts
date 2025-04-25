@@ -206,7 +206,8 @@ export class ProductService
   }
 
   private async findVariants(
-    product_ids: string[]
+    product_ids: string[],
+    context?: CallContext,
   ) {
     if (!product_ids?.length) {
       return null;
@@ -333,7 +334,8 @@ export class ProductService
       const variant_response = await this.findVariants(
         product_response.items?.map(
           item => item.payload.id
-        )
+        ),
+        context,
       );
       return assignVariants(product_response, variant_response, this.delimiter);
     }
@@ -440,7 +442,8 @@ export class ProductService
       }
       else {
         const variant_ids = await this.findVariants(
-          request.ids
+          request.ids,
+          context,
         ).then(
           r => r?.items?.map(item => item.payload?.id)
         );
@@ -474,7 +477,10 @@ export class ProductService
       context,
     );
     if (this.productVariantSrv) {
-      const variants = await this.findVariants(product_ids);
+      const variants = await this.findVariants(
+        product_ids,
+        context,
+      );
       assignVariants(products, variants, this.delimiter);
     }
 
