@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { CallContext } from 'nice-grpc-common';
+import { CallContext, Status } from 'nice-grpc-common';
 import { DatabaseProvider } from '@restorecommerce/chassis-srv';
 import { Topic } from '@restorecommerce/kafka-client';
 import { Sort_SortOrder } from '@restorecommerce/rc-grpc-clients';
@@ -60,13 +60,9 @@ const extractVariants = (
         if (n) {
           const variants = Object.entries(n).flatMap(
             ([type, vs]: [string, ProductVariant[]]) => vs?.map(
-              (v: any) => {
+              (v) => {
                 v.id ??= randomUUID().replace('-', '');
                 v.id = [item.id, nature, type, v.id].join(delimiter);
-                v.meta = {
-                  created: new Date(),
-                  modified: new Date(),
-                };
                 return v;
               }
             )
@@ -436,30 +432,47 @@ export class ProductService
     context?: CallContext,
   ): Promise<DeleteResponse> {
     if (this.productVariantSrv) {
-      const response = await super.superDelete(request, context);
       if (request.collection) {
         await this.productVariantSrv.delete(request, context);
+        return await super.superDelete(request, context);
       }
-      else {
-        const variant_ids = await this.findVariants(
-          request.ids,
+
+      const variant_ids = await this.findVariants(
+        request.ids,
+        context,
+      ).then(
+        r => r?.items?.map(item => item.payload?.id)
+      ).then(
+        ids => [...new Set(ids).values()]
+      );
+  
+      if (variant_ids?.length) {
+        const response = await this.productVariantSrv.delete(
+          { ids: variant_ids },
           context,
-        ).then(
-          r => r?.items?.map(item => item.payload?.id)
         );
-    
-        if (variant_ids?.length) {
-          await this.productVariantSrv.delete(
-            {
-              ids: [...new Set(variant_ids).values()]
-            },
-            context,
-          ).then(
-            r => response.status.push(...r.status)
+
+        if (response.operation_status?.code !== 200) {
+          return response;
+        }
+
+        request.ids = request.ids.filter(
+          id => !variant_ids.includes(id)
+        );
+        if (request.ids?.length) {
+          await super.superDelete(request, context).then(
+            r => {
+              response.status.push(...r.status);
+              response.operation_status = r.operation_status;
+            }
           );
         }
+
+        return response;
       }
-      return response;
+      else {
+        return super.superDelete(request, context);
+      }
     }
     else {
       return await super.superDelete(request, context);

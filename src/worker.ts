@@ -60,7 +60,6 @@ const ServiceDefinitions = [
   product
 ];
 
-const CrudEvents = ['Created', 'Modified', 'Deleted'];
 const capitalized = (entity: string): string => entity.split('_').map(
   element => element.charAt(0).toUpperCase() + element.slice(1)
 ).join('');
@@ -75,9 +74,15 @@ const makeResourceConfig = (cfg: any, namespace: string, entity: string, collect
   };
 
   const messageObject = capitalized(entity);
-  for (const event of CrudEvents) {
+  for (const event of ['Created', 'Modified']) {
     kafkaCfg[`${entity}${event}`] = {
       messageObject: `${prefixesCfg.serviceNamePrefix}${entity}.${messageObject}`
+    };
+  }
+  const deleteMessage = prefixesCfg.resourcesDeletedMessage ?? `${prefixesCfg.serviceNamePrefix}${entity}.Deleted`;
+  for (const event of ['Deleted', 'DeletedAll']) {
+    kafkaCfg[`${entity}${event}`] = {
+      messageObject: deleteMessage,
     };
   }
 

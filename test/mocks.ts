@@ -182,7 +182,6 @@ export const products: ProductList = {
         ]
       }
     },
-    meta,
   },{
     id: 'physicalProduct_2',
     active: true,
@@ -255,7 +254,6 @@ export const products: ProductList = {
         ]
       }
     },
-    meta,
   }],
   subject: subjects.superadmin,
 };
