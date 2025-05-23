@@ -1,4 +1,11 @@
 import {
+  Server,
+  OffsetStore,
+  database,
+  buildReflectionService,
+  Health
+} from '@restorecommerce/chassis-srv';
+import {
   createServiceConfig,
   type ServiceConfig
 } from '@restorecommerce/service-config';
@@ -7,7 +14,6 @@ import {
   createLogger,
   type Logger,
 } from '@restorecommerce/logger';
-import * as chassis from '@restorecommerce/chassis-srv';
 import { getService } from './services/index.js';
 import { CatalogCommandInterface } from './commandInterface.js';
 import { RedisClientType, createClient } from 'redis';
@@ -90,31 +96,26 @@ const makeResourceConfig = (cfg: any, namespace: string, entity: string, collect
 };
 
 export class Worker {
-  events: Events;
-  server: any;
-  topics: any;
-  offsetStore: chassis.OffsetStore;
-  services: any;
-  redisClient: RedisClientType;
-  
-  constructor(
-    protected readonly cfg?: ServiceConfig,
-    protected readonly logger?: Logger,
-  ) {
-    this.cfg = cfg ?? createServiceConfig(process.cwd());
-    this.logger = logger ?? createLogger(this.cfg.get('logger'));
-    this.topics = {};
-    this.services = {};
-  }
+  events?: Events;
+  server?: Server;
+  offsetStore?: OffsetStore;
+  redisClient?: RedisClientType;
+  topics?: any = {};
+  services?: any = {};
+  cfg?: ServiceConfig;
+  logger?: Logger;
 
-  async start(): Promise<any> {
+  async start(cfg?: ServiceConfig, logger?: Logger): Promise<any> {
     // Load config
-    const cfg = this.cfg;
-    const logger = this.logger;
+    this.cfg = cfg ??= createServiceConfig(process.cwd());
+    this.logger = logger ??= createLogger(cfg.get('logger'));
+
+    // create server
+    this.server = new Server(cfg.get('server'), logger);
     const kafkaCfg = cfg.get('events:kafka');
 
     // database
-    const db = await chassis.database.get(cfg.get('database:main'), logger);
+    const db = await database.get(cfg.get('database:main'), logger);
 
     // topics
     logger.verbose('Setting up topics');
@@ -127,9 +128,9 @@ export class Worker {
         makeResourceConfig(cfg, namespace, entry.resourceName, entry.collectionName);
       }
     }
-    const events = new Events(cfg.get('events:kafka'), logger);
-    await events.start();
-    this.offsetStore = new chassis.OffsetStore(events as any, cfg, logger);
+    this.events = new Events(cfg.get('events:kafka'), logger);
+    await this.events.start();
+    this.offsetStore = new OffsetStore(this.events as any, cfg, logger);
 
     // Enable events firing for resource api using config (check for string because of env)
     const isEventsEnabled = cfg.get('events:enableEvents').toString() === 'true';
@@ -140,8 +141,7 @@ export class Worker {
 
     // list of service names
     const serviceNamesCfg = cfg.get('serviceNames');
-    const server = new chassis.Server(cfg.get('server'), logger);
-    const cis = new CatalogCommandInterface(server, cfg, logger, events, this.redisClient);
+    const cis = new CatalogCommandInterface(this.server, cfg, logger, this.events, this.redisClient);
     const eventListener = async (msg: any, context: any, config: any, eventName: string): Promise<any> => {
       // command events
       await cis.command(msg, context);
@@ -149,7 +149,7 @@ export class Worker {
 
     for (const [topicKey, topicValue] of Object.entries<any>(kafkaCfg.topics)) {
       const topicName = topicValue.topic;
-      this.topics[topicKey] = await events.topic(topicName);
+      this.topics[topicKey] = await this.events.topic(topicName);
       const offSetValue = await this.offsetStore.getOffset(topicName);
       logger.info('subscribing to topic with offset value', topicName, offSetValue);
       if (kafkaCfg.topics[topicKey].events) {
@@ -183,21 +183,20 @@ export class Worker {
             entry.resourceName,
             entry.collectionName,
           );
-          await server.bind(fullServiceName, {
+          await this.server.bind(fullServiceName, {
             implementation: this.services[entry.serviceName],
             service: serviceDef
           } as BindConfig<any>);
         }
       }
     }
-    await server.bind(serviceNamesCfg.cis, {
+    await this.server.bind(serviceNamesCfg.cis, {
       service: CommandInterfaceServiceDefinition,
       implementation: cis
     } as BindConfig<CommandInterfaceServiceDefinition>);
 
     // Add reflection service
-    const reflectionServiceName = serviceNamesCfg.reflection;
-    const reflectionService = chassis.buildReflectionService([
+    const reflectionService = buildReflectionService([
       { descriptor: manufacturerMeta.fileDescriptor as any },
       { descriptor: priceGroupMeta.fileDescriptor },
       { descriptor: productCategoryMeta.fileDescriptor },
@@ -205,23 +204,25 @@ export class Worker {
       { descriptor: productMeta.fileDescriptor },
       { descriptor: commandInterfaceMeta.fileDescriptor }
     ]);
-    await server.bind(reflectionServiceName, {
+    await this.server.bind(serviceNamesCfg.reflection, {
       service: ServerReflectionService,
       implementation: reflectionService
     });
-
-    await server.bind(serviceNamesCfg.health, {
+    await this.server.bind(serviceNamesCfg.health, {
       service: HealthDefinition,
-      implementation: new chassis.Health(cis, {
-        readiness: async () => !!await ((db as Arango).db).version()
-      })
+      implementation: new Health(
+        cis,
+        {
+          logger,
+          cfg,
+          dependencies: ['acs-srv'],
+          readiness: () => (db as Arango).db.version().then(v => !!v)
+        }
+      )
     } as BindConfig<HealthDefinition>);
-
+    
     // Start server
-    await server.start();
-
-    this.events = events;
-    this.server = server;
+    await this.server.start();
     this.logger.info('Server started');
   }
 

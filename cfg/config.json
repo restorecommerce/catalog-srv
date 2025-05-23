@@ -216,7 +216,6 @@
     "product_category": "io-restorecommerce-product_category-srv",
     "product_prototype": "io-restorecommerce-product_prototype-srv",
     "product": "io-restorecommerce-product-srv",
-    "product_variant": "io-restorecommerce-product-variant-srv",
     "health": "grpc-health-v1"
   },
   "fieldHandlers": {
@@ -232,6 +231,36 @@
           "product_categorys",
           "product_prototypes",
           "products",
+          "product_variants"
+        ]
+      },
+      {
+        "fields": [
+          "bundle.valid_from",
+          "bundle.valid_to",
+          "product.physical.templates.[0].valid_from",
+          "product.physical.templates.[0].valid_to",
+          "product.physical.variants.[0].valid_from",
+          "product.physical.variants.[0].valid_to",
+          "product.virtual.templates.[0].valid_from",
+          "product.virtual.templates.[0].valid_to",
+          "product.virtual.variants.[0].valid_from",
+          "product.virtual.variants.[0].valid_to",
+          "product.service.templates.[0].valid_from",
+          "product.service.templates.[0].valid_to",
+          "product.service.variants.[0].valid_from",
+          "product.service.variants.[0].valid_to"
+        ],
+        "entities": [
+          "products"
+        ]
+      },
+      {
+        "fields": [
+          "valid_from",
+          "valid_to"
+        ],
+        "entities": [
           "product_variants"
         ]
       }

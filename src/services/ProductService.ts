@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { CallContext, Status } from 'nice-grpc-common';
+import { CallContext } from 'nice-grpc-common';
 import { DatabaseProvider } from '@restorecommerce/chassis-srv';
 import { Topic } from '@restorecommerce/kafka-client';
 import { Sort_SortOrder } from '@restorecommerce/rc-grpc-clients';
@@ -13,9 +13,10 @@ import {
   IndividualProductVariantListResponse,
   IndividualProductVariant,
   Product,
+  DeepPartial,
+  Session,
 } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product.js';
 import {
-  DeepPartial,
   DeleteRequest,
   DeleteResponse,
   Filter_Operation,
@@ -200,6 +201,18 @@ export class ProductService
       ...cfg.get('operationStatusCodes'),
     };
   }
+  claimVariant(request: IndividualProductVariantListRequest, context: CallContext): Promise<DeepPartial<IndividualProductVariantListResponse>> {
+    throw new Error('Method not implemented.');
+  }
+  releaseVariant(request: IndividualProductVariantListRequest, context: CallContext): Promise<DeepPartial<IndividualProductVariantListResponse>> {
+    throw new Error('Method not implemented.');
+  }
+  resolveSession(request: Session, context: CallContext): Promise<DeepPartial<IndividualProductVariantListResponse>> {
+    throw new Error('Method not implemented.');
+  }
+  dropSession(request: Session, context: CallContext): Promise<DeepPartial<IndividualProductVariantListResponse>> {
+    throw new Error('Method not implemented.');
+  }
 
   private async findVariants(
     product_ids: string[],
@@ -274,10 +287,10 @@ export class ProductService
         ...product,
         ...template,
         ...variant,
-        attibutes: unique(
+        attributes: unique(
           merge(
-            template.attibutes,
-            variant.attibutes,
+            template.attributes,
+            variant.attributes,
           )
         ),
         properties: unique(
