@@ -228,14 +228,14 @@
         "entities": [
           "manufacturers",
           "price_groups",
-          "product_categorys",
-          "product_prototypes",
-          "products",
-          "product_variants"
+          "product_categories",
+          "product_prototypes"
         ]
       },
       {
         "fields": [
+          "meta.created",
+          "meta.modified",
           "bundle.valid_from",
           "bundle.valid_to",
           "product.physical.templates.[0].valid_from",
@@ -257,6 +257,8 @@
       },
       {
         "fields": [
+          "meta.created",
+          "meta.modified",
           "valid_from",
           "valid_to"
         ],
