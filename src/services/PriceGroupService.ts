@@ -5,8 +5,8 @@ import {
   PriceGroupListResponse,
 } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/price_group.js';
 import {
- AccessControlledServiceBase
-} from '../experimental/AccessControlledServiceBase.js'
+  AccessControlledServiceBase
+} from '@restorecommerce/resource-base-interface/lib/experimental/AccessControlledServiceBase.js';
 
 export class PriceGroupService
   extends AccessControlledServiceBase<PriceGroupListResponse, PriceGroupList>

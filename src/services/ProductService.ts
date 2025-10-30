@@ -30,8 +30,12 @@ import {
   ProductVariantService
 } from './ProductVariantService.js';
 import {
-  AccessControlledServiceBase
-} from '../experimental/AccessControlledServiceBase.js'
+  ServiceBaseStatusCodes,
+  StatusCodes,
+} from '@restorecommerce/resource-base-interface';
+import {
+  AccessControlledServiceBase,
+} from '@restorecommerce/resource-base-interface/lib/experimental/AccessControlledServiceBase.js';
 import { createStatusCode, merge, unique } from '../utils.js';
 
 enum VARIANT_NATURES {
@@ -142,35 +146,26 @@ const initProductVariantService = (
   )
 );
 
+export const ProductStatusCodes = {
+  ...ServiceBaseStatusCodes,
+  VARIANT_NOT_FOUND: {
+    code: 404,
+    message: '{entity} {id}:{entity_id} not found!',
+  },
+  NO_INDIVIDUAL_PRODUCT: {
+    code: 400,
+    message: '{entity} {id}: is no individual product!',
+  },
+};
+export type ProductStatusCodes = StatusCodes<typeof ProductStatusCodes>;
+
 export class ProductService
   extends AccessControlledServiceBase<ProductListResponse, ProductList>
   implements ProductServiceImplementation
 {
-  private readonly status_codes = {
-    OK: {
-      code: 200,
-      message: 'OK',
-    },
-    VARIANT_NOT_FOUND: {
-      code: 404,
-      message: '{entity} {id}:{entity_id} not found!',
-    },
-    NO_INDIVIDUAL_PRODUCT: {
-      code: 400,
-      message: '{entity} {id}: is no individual product!',
-    },
-  };
-
-  protected readonly operation_status_codes = {
-    SUCCESS: {
-      code: 200,
-      message: 'success',
-    },
-    MULTI_STATUS: {
-      code: 207,
-      message: 'Multi status - response may include errors!',
-    },
-  };
+  protected override get statusCodes(): ProductStatusCodes {
+    return super.statusCodes;
+  }
 
   constructor(
     topic: Topic,
@@ -192,13 +187,9 @@ export class ProductService
   ) {
     super(resourceName, topic, db, cfg, logger, enableEvents, collectionName);
 
-    this.status_codes = {
-      ...this.status_codes,
-      ...cfg.get('statusCodes')
-    };
-    this.operation_status_codes = {
-      ...this.operation_status_codes,
-      ...cfg.get('operationStatusCodes'),
+    super.statusCodes = {
+      ...ProductStatusCodes,
+      ...cfg.get('statusCodes'),
     };
   }
   claimVariant(request: IndividualProductVariantListRequest, context: CallContext): Promise<DeepPartial<IndividualProductVariantListResponse>> {
@@ -255,7 +246,7 @@ export class ProductService
         throw createStatusCode(
           item.id,
           'Product',
-          this.status_codes.NO_INDIVIDUAL_PRODUCT,
+          this.statusCodes.NO_INDIVIDUAL_PRODUCT,
           variant_id,
         );
       }
@@ -273,7 +264,7 @@ export class ProductService
       throw createStatusCode(
         item.id,
         'Variant',
-        this.status_codes.VARIANT_NOT_FOUND,
+        this.statusCodes.VARIANT_NOT_FOUND,
         variant_id,
       );
     }
@@ -525,7 +516,7 @@ export class ProductService
             status: createStatusCode(
               item.product_id,
               'IndividualProductVariant',
-              this.status_codes.OK,
+              this.statusCodes.SUCCESS,
               item.variant_id,
             )
           }
@@ -538,8 +529,8 @@ export class ProductService
 
     const operation_status = (
       items?.every(item => item.status.code === 200)
-      ? this.operation_status_codes.SUCCESS
-      : this.operation_status_codes.MULTI_STATUS
+      ? this.operationStatusCodes.SUCCESS
+      : this.operationStatusCodes.MULTI_STATUS
     );
     return {
       items,

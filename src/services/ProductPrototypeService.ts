@@ -5,8 +5,8 @@ import {
   ProductPrototypeListResponse,
 } from '@restorecommerce/rc-grpc-clients/dist/generated-server/io/restorecommerce/product_prototype.js';
 import {
- AccessControlledServiceBase
-} from '../experimental/AccessControlledServiceBase.js'
+  AccessControlledServiceBase
+} from '@restorecommerce/resource-base-interface/lib/experimental/AccessControlledServiceBase.js';
 
 export class ProductPrototypeService
   extends AccessControlledServiceBase<ProductPrototypeListResponse, ProductPrototypeList>
