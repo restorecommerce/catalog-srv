@@ -197,7 +197,7 @@ export class Worker {
 
     // Add reflection service
     const reflectionService = buildReflectionService([
-      { descriptor: manufacturerMeta.fileDescriptor as any },
+      { descriptor: manufacturerMeta.fileDescriptor },
       { descriptor: priceGroupMeta.fileDescriptor },
       { descriptor: productCategoryMeta.fileDescriptor },
       { descriptor: productPorotoTypeMeta.fileDescriptor },
